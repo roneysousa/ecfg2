@@ -1,0 +1,2390 @@
+unit uFiscal;
+
+interface
+
+function FISCAL(Comando : String ; Modelo : Integer;
+Param1 : String = ''; Param2 : String = ''; Param3 : String = ''; Param4 : String = '';
+Param5 : String = ''; Param6 : String = ''; Param7 : String = ''; Param8 : String = '';
+Param9 : String = ''; Param10 : String = '';Param11 : String = ''; aTextoTef: String = '') : integer;
+function Retorno_Impressora(nComando : String; iRetorno : integer) : Integer;
+
+
+Var
+    aMensagem, aStatus : String;
+    aFirmware, aVersao, aNumSerie, aDataMovimento : String;
+
+implementation
+
+Uses uBematech, Forms, Windows, Messages, Dialogs, SysUtils, Variants, Controls, Classes,
+  uFuncoes, uDaruma, uSweda, uPrincipalECFG2, uElgin, uMecaf, uUrano;
+
+
+function FISCAL(Comando : String; Modelo : Integer;
+Param1 : String = ''; Param2 : String = ''; Param3 : String = ''; Param4 : String = '';
+Param5 : String = ''; Param6 : String = ''; Param7 : String = ''; Param8 : String = '';
+Param9 : String = ''; Param10 : String = '';Param11 : String = ''; aTextoTef: String = '') : integer;
+Var
+    iRetorno, mRetorno, iConta : Integer;
+    Status, NumeroCupom : String;
+    sCom: array [0..3] of char;
+    aResult : boolean;
+    //
+    sCod : array[0..20] of char;
+    sDescr : array[0..200] of char;
+    sAliq : array[0..5] of char;
+    sQtd : array[0..16] of char;
+    sValor : array[0..16] of char;
+    sAcreDesc : array[0..1] of char;
+    sPercVl : array[0..1] of char;
+    sDesc : array[0..16] of char;
+    sImp1L : array[0..1] of char;
+    sUnid : array[0..3] of char;
+    sTotal : array[0..16] of char;
+    sAcre   : array [0..30] of char;
+    sDescr2 : array [0..30] of char;
+    sDesc2  : array [0..30] of char;
+    sMsg : array[0..80] of char;
+    sIndice : array[0..2] of char;
+    Buffer: TStrings;
+    aArquivo : String;
+    Cont : Integer;
+begin
+      iRetorno := 1;
+      aMensagem := '';
+      aStatus := '';
+      {Modelos
+      1 = Bematech
+      2 = Daruma
+      3 = Sweda
+      4 = Elgin
+      5 = Mecaf
+      6 = Urano}
+      //
+      If (Comando = 'VersaoDll') Then
+         begin
+              case modelo of
+                1:begin       // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 9 do aVersao := aVersao + ' ';
+                            iRetorno := uBematech.Bematech_FI_VersaoDll( aVersao );
+                       End;
+                  End;
+                  //
+                2:begin       // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                  End;
+                3:begin       // Sweda
+                         for iConta := 1 to 9 do aVersao := aVersao + ' ';
+                            iRetorno :=  uSweda.ECF_VersaoDll( PChar( aVersao) );
+                  End;
+                //
+                4:begin       // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                       iRetorno := 1;
+                       aVersao := ' ';
+                  End;
+                //
+                5:begin       // Mecaf
+                      // Verifica Impressora
+                      //iRetorno := uMecaf._VerificaImpressoraLigada();
+                      iRetorno := 1;
+                      aVersao := uMecaf.VersaoDll();
+                  End;
+                //
+                6:begin       // Urano
+                      // Verifica Impressora
+                      iRetorno := 1;
+                      aVersao := uUrano.DLLG2_Versao(aVersao, 0) ;
+                  End;
+
+              End;
+         End;
+       //
+      If (Comando = 'VersaoFirmware') Then
+         begin
+              case modelo of
+                1:begin       // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 4 do aFirmware := aFirmware + ' ';
+                            iRetorno := uBematech.Bematech_FI_VersaoFirmware( aFirmware );
+                       End;
+                  End;
+                  //
+                2:begin       // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 4 do aFirmware := aFirmware + ' ';
+                            iRetorno := uDaruma.Daruma_FI_VersaoFirmware( aFirmware );
+                       End;
+                  End;
+                  //
+                3:begin       // Sweda
+                         for iConta := 1 to 4 do aFirmware := aFirmware + ' ';
+                            iRetorno := uSweda.Ecf_VersaoFirmware( Pchar(aFirmware) );
+                  End;
+                  //
+                4:begin       // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 8 do aFirmware := aFirmware + ' ';
+                            iRetorno := uElgin.Elgin_VersaoFirmware( aFirmware );
+                       End;
+                  End;
+                  //
+                  5:begin   // Mecaf
+                     iRetorno := 1;
+                     aFirmware := uMecaf.VersaoFirmware();
+                  End;
+                  //
+                  6:begin       // Urano
+                       iRetorno := 1;
+                  End;
+              End;
+         End;
+         //
+      If (Comando = 'NumeroSerie') Then
+         begin
+              case modelo of
+                1:begin       // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 15 do aNumSerie  := aNumSerie + ' ';
+                            iRetorno := uBematech.Bematech_FI_NumeroSerie( aNumSerie );
+                       End;
+                  End;
+                  //
+                2:begin       // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 15 do aNumSerie := aNumSerie + ' ';
+                            iRetorno := uDaruma.Daruma_FI_NumeroSerie( aNumSerie );
+                       End;
+                  End;
+                  //
+                3:begin       // Sweda
+                         for iConta := 1 to 15 do aNumSerie := aNumSerie + ' ';
+                            iRetorno := uSweda.Ecf_NumeroSerie( Pchar(aNumSerie) );
+                  End;
+                  //
+                4:begin       // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 15 do aNumSerie := aNumSerie + ' ';
+                            iRetorno := uElgin.Elgin_NumeroSerie( aNumSerie );
+                       End;
+                  End;
+                  //
+                  5:begin   // Mecaf
+                    iRetorno := 1;
+                    aNumSerie := uMecaf.NumeroSerie();
+                  End;
+                  //
+                  6:begin       // Urano
+                    iRetorno := 1;
+                    //aNumSerie := uUrano();
+                  End;
+              End;
+         End;
+         //
+      If (Comando = 'DataMovimento') Then
+         begin
+              case modelo of
+                1:begin       // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 6 do aDataMovimento := aDataMovimento + ' ';
+                            iRetorno := uBematech.Bematech_FI_DataMovimento( aDataMovimento  );
+                       End;
+                  End;
+                  //
+                2:begin       // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 6 do aDataMovimento := aDataMovimento + ' ';
+                            iRetorno := uDaruma.Daruma_FI_DataMovimento( aDataMovimento );
+                       End;
+                  End;
+                  //
+                3:begin       // Sweda
+                      for iConta := 1 to 6 do aDataMovimento := aDataMovimento + ' ';
+                            iRetorno := uSweda.Ecf_DataMovimento( Pchar(aDataMovimento) );
+                  End;
+                //
+                4:begin       // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                         for iConta := 1 to 6 do aDataMovimento := aDataMovimento + ' ';
+                            iRetorno := uElgin.Elgin_DataMovimento( aDataMovimento );
+                       End;
+                  End;
+                  5:begin   // Mecaf
+                    iRetorno := 1;
+                    aDataMovimento := uMecaf.DataMovimento();
+                  End;
+                  //
+                  6:begin       // Urano
+                        iRetorno := 1;
+                        uUrano.LeData(nPorta,'Data', aDataMovimento);
+                  End;
+              End;
+         End;
+         //
+      If (Comando = 'AbrePortaSerial') Then
+         begin
+              case modelo of
+                1:begin       // Bematech
+                      iRetorno := 1;
+                  End;
+                  //
+                2:begin       // Daruma
+                       iRetorno := 1;
+                  End;
+                  //
+                3:begin       // Sweda
+                      iRetorno := uSweda.ECF_AbrePortaSerial();
+                  End;
+                  //
+                4:begin       // Elgin
+                      iRetorno := 1;
+                  End;
+                  //
+                  5:begin   // Mecaf
+                      {Parâmetros: Porta = Porta serial (COM?), ou endereço de rede, em que o ECF está
+                      conectado. Esta informação será passada como um texto.
+                      Descrição: Abre a porta de comunicação com o ECF e verifica o status do mesmo.
+                      Observação: Se o parâmentro passado for ZERO, automaticamente será feita a busca pela porta.}
+                      iRetorno:= 0;
+                      If not (FileExists(ExtractFilePath( Application.ExeName +'\Mecaf.txt'))) Then
+                          Param1 := 'COM1'
+                      Else
+                          Param1 := 'COM3';
+                      fillchar (sCom, 4, 0);
+                      StrPCopy(sCom, Param1);
+                      iRetorno := uMecaf.AFRAC_AbrirPorta(sCom);
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                      //
+                  End;
+                  //
+                  6:begin       // Urano
+                        //aArquivo := ExtractFilePath( Application.ExeName) + 'urano.txt';
+                        //
+                        M_NMPORT := 'COM1';
+                        //
+                     If FileExists('PORTA.TXT') Then
+                       begin
+                        try
+
+                            AssignFile(M_ARCONF, 'PORTA.TXT');
+                            Reset(M_ARCONF, 'PORTA.TXT');
+                            ReadLn(M_ARCONF, M_LINHA);
+                            //
+                            M_NMPORT := M_LINHA;
+                            //
+                            Cont := 1;
+                            While not Eof ( M_ARCONF ) do
+                              begin
+                                   ReadLn(M_ARCONF, M_LINHA);
+                                   //
+                                   Case Cont of
+                                       1: M_NMPORT := M_LINHA;
+                                   End;
+                                   //
+                                   Cont := Cont + 1;
+                              End;
+
+                        finally
+                            CloseFile(M_ARCONF);
+                        end;
+                       End;
+                        //
+                        {If not (FileExists(aArquivo)) Then
+                          Param1 := 'COM1'
+                        Else
+                          Param1 := 'COM3';}
+                        Param1  := M_NMPORT;
+                        {nPorta   := 0;
+                        iRetorno := uUrano.IniciaDriver(aParam1);
+                        nPorta   := iRetorno;}
+                        nPorta := uUrano.IniciaDriver(Param1);
+                        if (nPorta >= 0) then
+                         begin
+                            iRetorno := 1;
+                         End
+                        else
+                         begin
+                           iRetorno := 0;
+                           Application.MessageBox(PChar('Erro na Operação > ' + InttoStr(nPorta) ), PChar(param1));
+                         End;
+                  End;
+              End;
+         End;
+         //
+      If (Comando = 'FechaPortaSerial') Then
+         begin
+              case modelo of
+                1:begin       // Bematech
+                      iRetorno := 1;
+                  End;
+                  //
+                2:begin       // Daruma
+                       iRetorno := 1;
+                  End;
+                  //
+                3:begin       // Sweda
+                      // Abre porta serial
+                      iRetorno := uSweda.ECF_FechaPortaSerial();
+                  End;
+                4:begin       // Elgin
+                      iRetorno := 1;
+                  End;
+                  //
+                  5:begin   // Mecaf
+                       uMecaf.FechaPorta;
+                  End;
+                  //
+                  6:begin       // Urano
+                        //iRetorno := uUrano.DLLG2_EncerraDriver(aParam1);
+                        {if ( frmMainEcFG2.TrataErro( EncerraDriver(nPorta)) ) then
+                         begin
+                            Application.MessageBox('Operação Realizada com Sucesso', 'Demo Fit');
+                            iRetorno := 1;
+                         end;      }
+                        iRetorno := uUrano.EncerraDriver(nPorta);
+                        //
+                        if (iRetorno = 0) then
+                           iRetorno := 1
+                        else
+                           iRetorno := 0;
+                  End;
+              End;
+         End;
+
+         //
+      If (Comando = 'LeituraX') Then
+         begin
+              case modelo of
+                1:begin       // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_LeituraX();
+                      iRetorno := Retorno_Impressora('LeituraX',iRetorno);
+                  End;
+                 2:begin     // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_LeituraX();
+                   End;
+                 3:begin      // Sweda
+                       iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                       if (iRetorno = 1) Then
+                           iRetorno := uSweda.ECF_LeituraX;
+                   end;
+                 4:begin       // Elgin
+                      // Verifica Impressora
+                      iRetorno := 0;
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uElgin.Elgin_LeituraX();
+                  End;
+                  5:begin   // Mecaf
+                        // Leitura X
+                        iRetorno := uMecaf.AFRAC_LeituraX;
+                        if (iRetorno = 0) then
+                           iRetorno := 1
+                        else
+                           iRetorno := 0;
+                  End;
+                  //
+                  6:begin       // Urano
+                        {Parâmetros
+                      	Variavel:	Destino
+                      	TipoDado:	string	Tamanho Máximo:	1	Opcional
+                      	Descricao:	Destino do retorno do comando: 'I' - Impressora; 'S' - Recepção Serial.
+                      	Variavel:	ImprimeBitmap
+                      	TipoDado:	bool	Tamanho Máximo:		Opcional
+                      	Descricao:	Quando setada (= 'true'), imprime o 'bitmap' neste documento.Se não informado, não será impresso.
+                      	Variavel:	Operador
+                      	TipoDado:	string	Tamanho Máximo:	8	Opcional
+                      	Descricao:	Identificação do operador.    }
+                        iRetorno := uUrano.EmiteLeituraX(nPorta, 'I', 'False', '', Buffer);
+                        if (iRetorno = 0) then
+                         begin
+                           iRetorno := 1;
+                           //iRetorno := uUrano.AvancaPapel();
+                        End;
+                        //
+                        iRetorno := uUrano.AvancaPapel();
+                  End;
+              End;  // fim-caso
+         end;   // LeituraX
+      //
+      If (Comando = 'ReducaoZ') Then
+       begin
+              case modelo of
+                1:begin       // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                         iRetorno := uBematech.Bematech_FI_ReducaoZ(pchar(DateToStr(Date)),pchar(TimeToStr(Time)));
+                      iRetorno := Retorno_Impressora('ReducaoZ',iRetorno);
+                  End;
+                2:begin       // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                         iRetorno := uDaruma.Daruma_FI_ReducaoZ();
+                         //iRetorno := uDaruma.Daruma_FI_ReducaoZ(pchar(DateToStr(Date)),pchar(TimeToStr(Time)));
+                  End;
+                3:begin       // Sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                         // Data:  STRING com a data atual no computador.  Os formatos aceitos são:   ddmmaa,   dd/mm/aa,  ddmmaaaa ou  dd/mm/aaaa.
+                         // Hora: STRING   com a hora do computador a ser ajustada no formato hhmmss ou hh:mm:ss. O ajuste está limitado a cinco minutos
+                           iRetorno := uSweda.ECF_FechamentoDoDia();
+                           //iRetorno := uSweda.ECF_ReducaoZ(pchar(DateToStr(Date)),pchar(TimeToStr(Time)));
+                      iRetorno := Retorno_Impressora('ReducaoZ',iRetorno);
+                  End;
+                4:begin       // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                         iRetorno := uElgin.Elgin_ReducaoZ(pchar(DateToStr(Date)),pchar(TimeToStr(Time)));
+                      //iRetorno := Retorno_Impressora('ReducaoZ',iRetorno);
+                  End;
+                5:begin       // Mecaf
+                      // Verifica Impressora
+                      //iRetorno := uMecaf
+                      Param1 := DatetoStr(Date());
+                      iRetorno := uMecaf.AFRAC_ReducaoZ(PChar(Param1));
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                 End;
+                  //
+                  6:begin       // Urano
+                       {Descrição:	Emite a redução Z - fechamento fiscal diário, permitindo opcionalmente o ajuste do relógio com
+                     	tolerância de 5 minutos a maior ou a menor com relação ao horário atual do relógio do ECF.
+                     	Observações:	Sendo informado um dos parâmetros <Data><Hora>, a informação de ambos será obrigatória p/ a
+                     	execução do comando. Se houver diferença de mais/menos 5 minutos entre data/hora do ECF e
+                     	<Data><Hora> informados, serão considerado apenas 5 minutos p/ o acerto.                      }
+                      //
+                      {Parâmetros
+                    	Variavel:	Hora
+                    	TipoDado:	hora	Tamanho Máximo:		Opcional
+                    	Descricao:
+                    	Variavel:	Operador
+                    	TipoDado:	string	Tamanho Máximo:	8	Opcional
+                    	Descricao:	Identificação do operador.}
+                      Param1 := ''; //TimetoStr(Time);
+                      Param2 := '';
+                      iRetorno := uUrano.EmiteReducaoZ(nPorta, Param2, Param1);
+                      if (iRetorno = 0) then
+                        begin
+                            iRetorno := 1;
+                            iRetorno := uUrano.AvancaPapel();
+                        End
+                        else
+                         begin
+                             frmMainEcFG2.TrataErro(iRetorno);
+                             //
+                             iRetorno := 0;
+                         End;
+                  End;
+              End;  //fim-caso
+       End;    // ReducaoZ
+       //
+       If (Comando = 'MemoriaFiscal') or (Comando = 'MemoriaFiscalData') Then
+         begin
+              case modelo of
+                1:begin       // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_LeituraMemoriaFiscalData(
+                                       pchar( Param1 ), pchar( Param2 ) );
+                      iRetorno := Retorno_Impressora('MemoriaFiscal',iRetorno);
+                 End;
+                 //
+                 2:begin       // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_LeituraMemoriaFiscalData(
+                                       pchar( Param1 ), pchar( Param2 ) );
+                      iRetorno := Retorno_Impressora('MemoriaFiscal',iRetorno);
+                 End;
+                3:begin       // Sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // DataInic: STRING   com a data inicial no formato   ddmmaa, dd/mm/aa, ddmmaaaa ou dd/mm/aaaa.
+                          // DataFim: STRING   com a data final    no formato  ddmmaa, dd/mm/aa, ddmmaaaa ou dd/mm/aaaa.
+                           iRetorno := uSweda.ECF_LeituraMemoriaFiscalData(pchar( Param1 ), pchar( Param2 ));
+                      iRetorno := Retorno_Impressora('MemoriaFiscal',iRetorno);
+                  End;
+                4:begin       // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uElgin.Elgin_LeituraMemoriaFiscalData(pchar( Param1 ), pchar( Param2 ) , pchar( 'c') );
+                 End;
+                5:begin       // Mecaf
+                      // Verifica Impressora
+                      //iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      iRetorno := uMecaf.AFRAC_EmitirLeituraMemoriaFiscal('1', pchar(Param1) , pchar( Param2));
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                 End;
+                  //
+                  6:begin       // Urano
+                        {Parâmetros
+                        Variavel:	DataFinal
+	                      TipoDado:	data	Tamanho Máximo:		Opcional
+                      	Descricao:	 Data desejada para encerrar a emissão da leitura da Memória Fiscal.
+                      	Variavel:	DataInicial
+                      	TipoDado:	data	Tamanho Máximo:		Opcional
+                      	Descricao:	 Data desejada para iniciar a emissão da leitura da Memória Fiscal.
+                      	Variavel:	Destino
+                      	TipoDado:	string	Tamanho Máximo:	1	Opcional
+                      	Descricao:	Destino do retorno do comando: 'I' - Impressora; 'S' - Recepção Serial.
+                      	Variavel:	LeituraSimplificada
+                      	TipoDado:	bool	Tamanho Máximo:	0	Obrigatório
+                      	Descricao:	Indicador de leitura simplificado, quando setado.
+                      	Variavel:	Operador
+                      	TipoDado:	string	Tamanho Máximo:	8	Opcional
+                      	Descricao:	Identificação do operador.
+                      	Variavel:	ReducaoFinal
+                      	TipoDado:	uint	Tamanho Máximo:		Opcional
+                      	Descricao:	Redução desejada para encerrar a emissão da leitura da Memória Fiscal.
+                      	Variavel:	ReducaoInicial
+                      	TipoDado:	uint	Tamanho Máximo:		Opcional
+                      	Descricao:	Redução desejada para iniciar a emissão da leitura da Memória Fiscal.                      }
+                        //
+                        iRetorno := uUrano.EmiteLeituraMF(nPorta,  Param1, Param2, 'I', 'False', Buffer);
+                        if (iRetorno = 0) then
+                         begin
+                           iRetorno := 1;
+                           iRetorno := uUrano.AvancaPapel();
+                         End
+                        else
+                           iRetorno := 0;
+                  End;
+              End; // fim-caso
+         End;     // fim-MemoriaFiscal
+         //
+         if (Comando = 'StatusEcf') Then
+           begin
+              mRetorno := 0;
+              case modelo of
+                1:begin       // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                           iRetorno := uBematech.Bematech_FI_FlagsFiscais(mRetorno);
+                           iRetorno := Retorno_Impressora('FlagsFiscais',iRetorno);
+                       End;
+                      aStatus := inttostr(mRetorno);
+                  End;
+                  //
+                2:begin      // daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_FlagsFiscais(mRetorno);
+                      aMensagem := inttostr(mRetorno);
+                  End;
+                  //
+                3:begin  // sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uSweda.ECF_FlagsFiscais(mRetorno);
+                      aMensagem := inttostr(mRetorno);
+                  End;
+                4:begin       // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_FlagsFiscais(mRetorno);
+                      aStatus := inttostr(mRetorno);
+                  End;
+                 //
+                 5:begin
+                   iRetorno := 1;
+                 End;
+                  //
+                  6:begin       // Urano
+                      iRetorno := 1;
+                  End;
+               End;  // fim-case
+           End;  // fim-StatusEcf
+           //
+           If (Comando = 'AbreCupom') Then
+             begin
+               case modelo of
+                   1:begin  // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_AbreCupom( pchar( '' ) );
+                      iRetorno := Retorno_Impressora('AbreCupom',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                    End;
+                   2:begin  // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_AbreCupom( pchar( '' ) );
+                    End;
+                   3:begin   //sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                         // CNPJ_CPF: STRING até 20 caracteres com o CNPJ/CPF do consumidor  Se não tiver, informar espaços ou “”.
+                          iRetorno := uSweda.ECF_AbreCupom( pchar( Param1 ) );
+                   end;
+                   4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();;
+                      If (iRetorno = 1) Then
+                          iRetorno := uElgin.Elgin_AbreCupom( pchar( '' ) );
+                      iRetorno := Retorno_Impressora('AbreCupom',iRetorno);
+                    End;
+                    5:begin       // Mecaf
+                      iRetorno := uMecaf.AFRAC_AbrirCupom();
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                     End;
+                     //
+                     6:begin       // Urano
+                           {Parâmetros
+                         	Variavel:	EnderecoConsumidor
+                         	TipoDado:	string	Tamanho Máximo:	80	Opcional
+                         	Descricao:	Endereço do consumidor.
+                         	Variavel:	IdConsumidor
+                         	TipoDado:	string	Tamanho Máximo:	29	Opcional
+                         	Descricao:	Identificação do consumidor.
+                         	Variavel:	NomeConsumidor
+                         	TipoDado:	string	Tamanho Máximo:	30	Opcional
+                         	Descricao:	Nome do consumidor.}
+                          //uUrano.DLLG2_LimpaParams(0);
+                          iRetorno := uUrano.AbreCupomFiscal(nPorta, Param1, Param2, Param3 );
+                          //
+                          if (iRetorno = 0) then
+                              iRetorno := 1;
+                     End;
+               End; //fim-caso
+             End;  // fim- AbriCupom
+             //
+        If (Comando = 'CancelaCupom') Then
+           begin
+               case modelo of
+                   1:begin  // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_CancelaCupom;
+                      iRetorno := Retorno_Impressora('CancelaCupom',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                    End;
+                    //
+                    2:begin   //daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_CancelaCupom;
+                    End;
+                    3:begin  //sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uSweda.ECF_CancelaCupom;
+                    End;
+                    //
+                   4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uElgin.Elgin_CancelaCupom;
+                    End;
+                    5:begin    // Mecaf
+                      iRetorno := uMecaf.AFRAC_CancelarCupom();
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                    End;
+                    //
+                    6:begin       // Urano
+                           {Parâmetros
+                         	Variavel:	Operador
+                         	TipoDado:	string	Tamanho Máximo:	8	Opcional
+                         	Descricao:	Identificação do operador. }
+                          iRetorno := uUrano.CancelaCupom(nPorta, Param1);
+                          if (iRetorno = 0) then
+                           begin
+                               iRetorno := 1;
+                               iRetorno := uUrano.AvancaPapel();
+                           End;
+                    End;
+               End; // fim-caso
+           End;  // fim-CancelaCupom
+           //
+         If (Comando = 'CancelaItemGenerico') Then
+           begin
+               case modelo of
+                   1:begin  // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_CancelaItemGenerico(PChar(Param1)) ;
+                      iRetorno := Retorno_Impressora('CancelaItemGenerico',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                   End;
+                   2:begin // daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_CancelaItemGenerico(PChar(Param1)) ;
+                    End;
+                    3:begin  // sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // NumeroItem: STRING com o número do item a ser cancelado com no máximo 3 dígitos. Informando “” ou zeros cancelará o último item.
+                          iRetorno := uSweda.ECF_CancelaItemGenerico(PChar(Param1)) ;
+                    End;
+                   4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uElgin.Elgin_CancelaItemGenerico(PChar(Param1)) ;
+                   End;
+                   5:begin      // Mecaf
+                       iRetorno := uMecaf.AFRAC_CancelarItem(PChar(Param1));
+                       if (iRetorno = 0) then
+                          iRetorno := 1
+                       else
+                          iRetorno := 0;
+                     End;
+                    //
+                    6:begin       // Urano
+                           {Parâmetros
+                         	Variavel:	NumItem
+                         	TipoDado:	int	Tamanho Máximo:		Opcional
+                         	Descricao:	Número seqüencial de lançamento do item a que se refere esta operação no cupom em emissão.
+                         	Variavel:	Quantidade
+                         	TipoDado:	money	Tamanho Máximo:		Opcional
+                         	Descricao:	Quantidade envolvida na transação.Quando este parâmetro não for informado, cancela
+                         	quantidade total referente ao item ou ao código.}
+                          iRetorno := uUrano.CancelaItemFiscal(nPorta, Param1, '' ); // param2
+                          frmMainEcFG2.TrataErro(iRetorno);
+                          //
+                          if (iRetorno = 0) then
+                             iRetorno := 1;
+                    End;
+                   //
+               End; // fim-caso
+               //
+           End;      // fim -  CancelaItemGenerico
+        //
+        If (Comando = 'CancelaItemAnterior') Then
+          begin
+               case modelo of
+                   1:begin  // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_CancelaItemAnterior;
+                      iRetorno := Retorno_Impressora('CancelaItemAnterior',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                   End;
+                   2:begin  // daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_CancelaItemAnterior;
+                   End;
+                   3:begin  //sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno :=  uSweda.ECF_CancelaItemAnterior;
+                   End;
+                   4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uElgin.Elgin_CancelaItemAnterior;
+                   End;
+                   5:begin   // Mecaf
+                       iRetorno := uMecaf.AFRAC_CancelarItem(PChar('0'));
+                       if (iRetorno = 0) then
+                          iRetorno := 1
+                       else
+                          iRetorno := 0;
+                   End;
+                   //
+                   6:begin       // Urano
+                         {Descrição:	Cancela total ou parcialmente item emitido em um cupom fiscal. Se nenhum parâmetro for informado,
+                       	cancela o último item registrado.
+                       	Observações:
+                         Retornos
+                         Parâmetros
+                       	Variavel:	NumItem
+                       	TipoDado:	int	Tamanho Máximo:		Opcional
+                       	Descricao:	Número seqüencial de lançamento do item a que se refere esta operação no cupom em emissão.
+                       	Variavel:	Quantidade
+                       	TipoDado:	money	Tamanho Máximo:		Opcional
+                  	     Descricao:	Quantidade envolvida na transação.Quando este parâmetro não for informado, cancela
+                  	     quantidade total referente ao item ou ao código.}
+                         iRetorno := uUrano.CancelaItemFiscal(nPorta, '', '');
+                         frmMainEcFG2.TrataErro(iRetorno);
+                         //
+                         if (iRetorno = 0) then
+                             iRetorno := 1;
+                   End;
+               End; // fim-caso
+          End; //      fim-CancelaItemAnterior
+          //
+        If (Comando = 'VendaItem') Then
+         begin
+               case modelo of
+                   1:begin  // Bematech
+                      // Verifica Impressora
+                      //iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      iRetorno := 1;
+                      Param2 := copy(Param2,1,29);
+                      Param5 := copy(Param5,8,7);
+                      Param7 := copy(Param7,7,8);
+                      if (Param8 = '$') then
+                         Param9 := copy(Param9,7,8);
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_VendeItem
+                                 ( pchar( Param1 ),           // Codigo (13)
+                                   pchar( Param2 ),           // Descricao (29)
+                                   pchar( Param3 ),           // Aliquota (2)  Indice da ECF
+                                   pchar( Param4 ),           // Tipo Qtde (1) I - Inteira e F - Fracionária.
+                                   pchar( Param5 ),           // Quantidade (7)  3 são fração
+                                   StrtoInt(Param6),          // Casa Decimais (Valores validos : 2 ou 3)
+                                   pchar( Param7),            // Valor (8)
+                                   pchar( Param8 ),           // Tipo desconto (Valores validos : % ou $)
+                                   pchar( Param9 ));           // Desconto (8 para valor e 4 p/ percentual)
+                      //if (iRetorno) = 1 then
+                      iRetorno := Retorno_Impressora('VendaItem',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                   End;
+                   //
+                   2:begin  //daruma
+                      // Verifica Impressora
+                      //iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      iRetorno := 1;
+                      Param2 := copy(Param2,1,29);
+                      Param5 := copy(Param5,8,7);
+                      Param7 := copy(Param7,7,8);
+                      if (Param8 = '$') then
+                         Param9 := copy(Param9,7,8);
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_VendeItem
+                                 ( pchar( Param1 ),     // Codigo (13)
+                                   pchar( Param2 ),     // Descricao (29)
+                                   pchar( Param3 ),     // Aliquota (2)  Indice da ECF
+                                   pchar( Param4 ),     // Tipo Qtde (1) I - Inteira e F - Fracionária.
+                                   pchar( Param5 ),     // Quantidade (7)  3 são fração
+                                   StrtoInt(Param6),    // Casa Decimais (Valores validos : 2 ou 3)
+                                   pchar( Param7 ),     // Valor (8)
+                                   pchar( Param8 ),     // Tipo desconto (Valores validos : % ou $)
+                                   pchar( Param9 ) );   // Desconto (8 para valor e 4 p/ percentual)
+                    End;
+                    3:begin   //sweda
+                      // Verifica Impressora
+                      //iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      iRetorno := 1;
+                      Param2 := copy(Param2,1,29);
+                      Param5 := copy(Param5,8,7);
+                      Param7 := copy(Param7,7,8);
+                      if (Param8 = '$') then
+                         Param9 := copy(Param9,7,8);
+                      If (iRetorno = 1) Then
+                           iRetorno := uSweda.ECF_VendeItem
+                                 ( pchar( Param1 ),     // STRING até 14 caracteres com o código do produto.
+                                   pchar( Param2 ),     // STRING até 29 caracteres com o nome do produto.
+                                   pchar( Param3 ),     // STRING com a taxa, indicador ou índice tributário.   -- Aliquota (2)  Indice da ECF
+                                   pchar( Param4 ),     // STRING   de 1 (um) caracter indicando o tipo de quantidade: “I” - Inteira. “F” - Fracionária.
+                                   pchar( Param5 ),     // STRING  com até  4  dígitos para a quantidade inteira e 7 dígitos para a quantidade fracionária  (sendo 3 casas decimais). Se o ponto e a vírgula forem informados eles serão  ignorados.
+                                   StrtoInt(Param6),    // INTEIRO   indicando o número de casas decimais para o valor unitário (2 ou 3).
+                                   pchar( Param7 ),     // STRING  até 8 dígitos com o valor unitário. Se o ponto e a vírgula forem informados eles serão ignorados.
+                                   pchar( Param8 ),     // STRING de 1 caracter indicando o tipo do desconto: “$” = desconto por valor. “%” = desconto percentual.
+                                   pchar( Param9 ) );   // STRING com até 8 dígitos para desconto em valor (duas casas decimais) e 4 dígitos para desconto percentual. Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                      iRetorno := Retorno_Impressora('VendaItem',iRetorno);
+                    End;
+                   4:begin  // Elgin
+                      // Verifica Impressora
+                      //iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      iRetorno := 1;
+                      Param2 := copy(Param2,1,29);
+                      Param5 := copy(Param5,8,7);
+                      Param7 := copy(Param7,7,8);
+                      if (Param8 = '$') then
+                      begin
+                         Param9 := copy(Param9,7,8);
+                         Param9 := Copy(Param9, 2, 6)+','+Copy(Param9, 7,2);
+                      End;
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_VendeItem
+                                 ( pchar( Param1 ),           // Codigo (13)
+                                   pchar( Param2 ),           // Descricao (29)
+                                   pchar( Param3 ),           // Aliquota (2)  Indice da ECF
+                                   pchar( Param4 ),           // Tipo Qtde (1) I - Inteira e F - Fracionária.
+                                   pchar( Param5 ),           // Quantidade (7)  3 são fração
+                                   StrtoInt(Param6),          // Casa Decimais (Valores validos : 2 ou 3)
+                                   pchar( Param7),            // Valor (8)
+                                   pchar( Param8 ),           // Tipo desconto (Valores validos : % ou $)
+                                   pchar( Param9 ));           // Desconto (8 para valor e 4 p/ percentual)
+                      //if (iRetorno) = 1 then
+                         iRetorno := Retorno_Impressora('VendaItem',iRetorno);
+                   End;
+                   5:begin   // Mecaf
+                      // Verifica Impressora
+                      iRetorno := 1;
+                      //
+                      FillChar(sCod,21,0);
+                      Fillchar(sDescr,201,0);
+                      Fillchar(sAliq,6,0);
+                      Fillchar(sQtd,17,0);
+                      Fillchar(sValor,17,0);
+                      Fillchar(sAcreDesc,2,0);
+                      Fillchar(sPercVl,2,0);
+                      Fillchar(sDesc,17,0);
+                      Fillchar(sImp1L,2,0);
+                      Fillchar(sUnid,4,0);
+                      FillChar(sTotal,17,0);
+                      //
+                      DecimalSeparator := '.';
+                      StrPCopy(sCod,Param1);
+                      StrPCopy(sDescr,uFuncoes.Alltrim(Param2));
+                      Param5 := copy(Param5,1,11)+'.'+copy(Param5,12,3);
+                      Param7 := copy(Param7,1,12)+'.'+copy(Param7,13,2);
+                      Param9 := copy(Param9,1,12)+'.'+copy(Param9,13,2);
+                      StrPCopy(sQtd,FloatToStrf(StrtoFloat(Param5), fffixed, 16,2));
+                      StrPCopy(sValor, FloatToStrf(StrtoFloat(Param7), fffixed, 16, 2));
+                      if (Param8 = '$') then
+                         begin
+                           StrPCopy(sAcreDesc, '1');
+                           StrPCopy(sPercVl, '1');
+                         end
+
+                      else
+                         begin
+                            StrPCopy(sAcreDesc, '0');
+                            StrPCopy(sPercVl, '0');
+                         end;
+                      StrPCopy(sDesc, FloatToStrf(StrtoFloat(Param9), fffixed, 16, 2));
+                      StrPCopy(sUnid, Param10);
+                      StrPCopy(sImp1L,'0');
+                      StrPCopy(sTotal,'0');
+                      //
+                      Param2 := copy(Param2,1,29);
+                      Param5 := copy(Param5,8,7);
+                      Param7 := copy(Param7,7,8);
+                      //
+                      if pos(Param3[1],'IFN') > 0 then
+                         StrPCopy(sAliq,'M' + Param3[1] + '00')
+                      else
+                         if pos(Param3[1],'J') > 0 then
+                            StrPCopy(sAliq,copy(Param3,1,2))
+                         else
+                            //StrPCopy(sAliq,'M'+'T' + copy(Param3,1,2));
+                            StrPCopy(sAliq,'M' + Param3 );
+                      //
+                      If (iRetorno = 1) Then
+                           iRetorno := uMecaf.AFRAC_VenderItem(sCod, sDescr, sQtd,
+                                sValor, sAcreDesc, sPercVl, sDesc,  sTotal, sAliq, sUnid,sImp1L);
+                           {iRetorno := uMecaf.AFRAC_VenderItem
+                                 ( pchar( Param1 ),           // codigo = código do produtoQuantidade
+                                   pchar( Param2 ),           // descricao = descricao do produto
+                                   pchar( Param5 ),           // qtde = quantidade do item
+                                   pchar( Param7 ),           // valor_unitario = valor unitario do item
+                                   pchar( Param8 ),           // acres_desc = define se será dado um acréscimo ou desconto sobre o item
+                                   pchar( Param9 ),           // perc_valor = define se o acréscimo ou valor será percentual ou valor
+                                   pchar( Param9 ),           // valor_acresdesc = valor do acréscimo ou desconto
+                                   pchar( Param8 ),           // valor_total = a biblioteca retorna nesta variável o valor total do item
+                                   pchar( Param3 ),           // aliquota = código da alíquota do item
+                                   pchar( Param10),           // unidade = texto que descreve a unidade do item. Se não informado, assumese ‘UN’
+                                   pchar( Param11));          // ForcarImpressaoUmaLinha = forçar impressão em uma linha se o ECF tiver o recurso.
+                          //iRetorno := Retorno_Impressora('VendaItem',iRetorno);}
+                          uMecaf.Ret(iRetorno,'AFRAC_VenderItem');
+                          if (iRetorno = 0) then
+                             iRetorno := 1
+                          else
+                             iRetorno := 0;
+                   End;
+                   //
+                   6:begin       // Urano
+                           {Parâmetros
+	                         Variavel:	AliquotaICMS
+                         	TipoDado:	bool	Tamanho Máximo:		Opcional
+                         	Descricao:	Identifica a aliquota como ICMS ('true') ou ISS ('false').Deve ser utilizado em conjunto com o
+                         	parâmetro <PercentualAliquota> para identificar a alíquota deste produto.
+                         	Variavel:	CodAliquota
+                         	TipoDado:	byte	Tamanho Máximo:		Opcional
+                         	Descricao:	Índice da alíquota, sendo válidos os valores: intervalo entre 0 e
+                         	NUM_ALIQUOTAS_PROGRAMAVEIS; -4 = N.Trib. ICMS ou 'N'; -3 = Isento ICMS ou 'I'; -2 =
+                         	Subst.Trib. ICMS ou 'F'; -11 = 'F' ISS, -12 = 'I' ISS e -13 = 'N' ISS.Se informado tem precedência
+                         	sobre os parâmetros <AliquotaICMS> e <PercentualAliquota>.
+                         	Variavel:	CodDepartamento
+                         	TipoDado:	byte	Tamanho Máximo:		Opcional
+                         	Descricao:	Índice do departamento entre 0 e NUM_DEPARTAMENTOS.Quando não informado, o comando de
+                         	venda de item não acresce o valor vendido a totalizadores de departamento. Este parâmetro tem
+                         	precedência sobre o parâmetro <NomeDepartamento>.
+                         	Variavel:	CodProduto
+                         	TipoDado:	string	Tamanho Máximo:	48	Obrigatório
+                         	Descricao:	Código do produto.
+                         	Variavel:	NomeDepartamento
+                         	TipoDado:	string	Tamanho Máximo:	15	Opcional
+                         	Descricao:	Nome do departamento. Exemplo: Padaria, Açougue, Têxtil, etc.O departamento de venda deste
+                         	produto pode ser informado pelo seu nome opcionalmente ao seu código no parâmetro
+                         	<CodDepartamento>.
+                         	Variavel:	NomeProduto
+                         	TipoDado:	string	Tamanho Máximo:	200	Obrigatório
+                         	Descricao:	Nome descritivo do produto.
+                         	Variavel:	PercentualAliquota
+                         	TipoDado:	money	Tamanho Máximo:		Opcional
+                         	Descricao:	Valor percentual com precisão de 2 casas decimais.Utilizado em conjunto com o parâmetro
+                         	<AliquotaICMS> é um modo alternativo à indicação da alíquota quando o parâmetro <CodAliquota>
+                         	não for informado. A alíquota deve estar necessariamente definida.
+                         	Variavel:	PrecoUnitario
+                         	TipoDado:	money	Tamanho Máximo:		Obrigatório
+                         	Descricao:	Preço Unitário.O comando de venda de item trata preços unitários que possuam até 3 casas
+                         	decimais, limitados por força de legislação a 11 dígitos máximos.
+                         	Variavel:	Quantidade
+                         	TipoDado:	money	Tamanho Máximo:		Obrigatório
+                         	Descricao:	Quantidade envolvida na transação.O comando de venda de item trata quantidades com até 3
+                         	casas decimais, limitados por força de legislação a 8 dígitos máximos.
+                         	Variavel:	Unidade
+                         	TipoDado:	string	Tamanho Máximo:	2	Opcional
+                         	Descricao:	Unidade do produto. Se não informado será assumido o texto "un" (sem as aspas).}
+                          //iRetorno := uUrano.VendeItem(nPorta, Param3, param1, param2, Param7, Param5, Param10);
+                          If (Param3 = '1700') Then
+                              Param3 := '01';
+                          If (Param3 = '1200') Then
+                              Param3 := '02';
+                          If (Param3 = '2500') Then
+                              Param3 := '03';
+                          If (Param3 = '3000') Then
+                              Param3 := '04';
+                          If (Param3 = 'F1') Then  // Substituição tributária (T07)
+                              Param3 := '-2';
+                          If (Param3 = 'I1') Then  // Isenção (T08)
+                              Param3 := '-3';
+                          If (Param3 = 'N1') Then  // Não tributadas (T09)
+                              Param3 := '-4';
+                          // Quant
+                          Param5 := InttoStr(StrtoInt(copy(Param5,1,11)))+','+copy(Param5,12,2);
+                          // Valor
+                          Param7 := InttoStr(StrtoInt(copy(Param7,1,12)))+','+copy(Param7,13,2);
+                          iRetorno := 0;
+                          //
+                          Param2 := copy(Param2,1,29);
+                          {Param5 := copy(Param5,8,8);
+                          Param7 := copy(Param7,6,11);}
+                          //
+                          try
+                            uUrano.DLLG2_LimpaParams(0);
+                            uUrano.DLLG2_AdicionaParam(0, 'CodAliquota', Param3, 4);
+                            uUrano.DLLG2_AdicionaParam(0, 'CodProduto', Param1, 7);
+                            uUrano.DLLG2_AdicionaParam(0, 'NomeProduto', uFuncoes.RemoveAcento(Param2), 7);
+                            uUrano.DLLG2_AdicionaParam(0, 'PrecoUnitario', Param7, 6);
+                            uUrano.DLLG2_AdicionaParam(0, 'Quantidade', Param5, 6);
+                            uUrano.DLLG2_AdicionaParam(0, 'Unidade', Param10, 7);
+                            //
+                            iRetorno := uUrano.DLLG2_ExecutaComando(0, 'VendeItem');
+                            frmMainEcFG2.TrataErro(iRetorno);
+                            //
+                          Except
+
+                          End;
+                          {iRetorno := uUrano.VendeItem(nPorta, Param3, param1, param2, Param7, Param5, Param10);
+                          if (iRetorno = 0) then
+                             iRetorno := 1;
+                          frmMainEcFG2.TrataErro( iRetorno );}
+                          {Param3,   CodAliquota
+                          param1,    CodProduto
+                          param2,    NomeProduto
+                          Param7,    PrecoUnitario
+                          Param5,   Quantidade
+                          Param10    Unidade
+                          }
+                   End;
+               End; // fim-caso
+         End;   // VendaItem
+      //
+      If (Comando = 'TotalCupom') Then
+        begin
+             case modelo of
+                1:begin  // bematech
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_IniciaFechamentoCupom(
+                              pchar( Param1 ),    // Acrescimo/Desconto (Valores validos : A ou D)
+                              pchar( Param2 ),    // TipoAcrescimoDesconto (Valores validos : % ou $)
+                              pchar( Param3 ));  // Valor AcrescimoDesconto (14 por valor ou 4 percentual)
+                      iRetorno := Retorno_Impressora('TotalCupom',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                  End;
+                 //
+                2:begin  // Daruma
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_IniciaFechamentoCupom(
+                              pchar( Param1 ),    // Acrescimo/Desconto (Valores validos : A ou D)
+                              pchar( Param2 ),    // TipoAcrescimoDesconto (Valores validos : % ou $)
+                              pchar( Param3 ) );  // Valor AcrescimoDesconto (14 por valor ou 4 percentual)
+                     //
+                     iRetorno := Retorno_Impressora('TotalCupom',iRetorno);
+                End; //
+                //
+                3:begin  // Sweda
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // AcresDesc: STRING = "A" para acréscimo. STRING = "D" para  desconto.
+                          // TipoAcresDesc: STRING = "$'  para valor. STRING = "%" para percentual.
+                          // ValAcresDesc:  STRING    até 14  dígitos para acréscimo  ou desconto por valor ou 4 dígitos para acréscimo ou desconto em percentual. Se o ponto e a vírgula forem informados no valor eles serão ignorados.
+                          iRetorno := uSweda.ECF_IniciaFechamentoCupom(
+                              pchar( Param1 ),    // Acrescimo/Desconto (Valores validos : A ou D)
+                              pchar( Param2 ),    // TipoAcrescimoDesconto (Valores validos : % ou $)
+                              pchar( Param3 ) );  // Valor AcrescimoDesconto (14 por valor ou 4 percentual)
+                      //
+                      iRetorno := Retorno_Impressora('TotalCupom',iRetorno);
+                End;
+                4:begin  // Elgin
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uElgin.Elgin_IniciaFechamentoCupom(
+                              pchar( Param1 ),    // Acrescimo/Desconto (Valores validos : A ou D)
+                              pchar( Param2 ),    // TipoAcrescimoDesconto (Valores validos : % ou $)
+                              pchar( Param3 ) );  // Valor AcrescimoDesconto (14 por valor ou 4 percentual)
+                      iRetorno := Retorno_Impressora('TotalCupom',iRetorno);
+                  End;
+                5:begin  // Mecaf
+                      // Total sem desconto e acrescimo
+                      Fillchar(sDesc2,30,0);
+                      Fillchar(sPercVl,2,0);
+                      Fillchar(sAcreDesc,2,0);
+                      Fillchar(sValor,17,0);
+                      if (Param1 = 'D') then
+                          begin
+                            Param1 := '1';
+                            StrPCopy(sDesc2,'Desconto');
+                          end
+                      else
+                          begin
+                            Param1 := '0';
+                            StrPCopy(sDesc2,'Acrescimo');
+                          end;
+
+                      if (Param2 = '$') then
+                          Param2 := '1'
+                      else
+                          Param2 := '0';
+
+                      DecimalSeparator := '.';
+                      Param3 := copy(Param3,1,11)+'.'+copy(Param3,12,2);
+                      StrPCopy(sValor,FloatToStrf(StrtoFloat(Param3), fffixed, 16,2));
+                      StrPCopy(sAcreDesc,Param1);
+                      StrPCopy(sPercVl,Param2);
+                      if (StrtoFloat(Param3) > 0) then
+                          begin
+                              iRetorno := uMecaf.AFRAC_AcrescimoDescontoCupom(
+                                          sAcreDesc,          // define se será dado desconto ou acréscimo
+                                          sPercVl,            // define se o acréscimo ou desconto será por valor ou percentual
+                                          SValor,             // valor do acréscimo ou desconto
+                                          sDesc2);            // texto complementar
+                              if (iRetorno = 0) then
+                                  begin
+                                    FillChar(sAcre,31,0);
+                                    FillChar(sDesc,31,0);
+                                    FillChar(sDescr,31,0);
+                                    //
+                                    StrPCopy(sDesc, 'Desconto');
+                                    StrPCopy(sAcre, 'Acrescimo');
+                                    StrPCopy(sDescr, sDesc + sAcre);
+                                    //
+                                    iRetorno := uMecaf.AFRAC_FecharAcrescimoDesconto(sDesc, sAcre, sDescr);
+                                    uMecaf.Ret(iRetorno,'AFRAC_FecharAcrescimoDesconto');
+                                    if (iRetorno = 0) then
+                                      iRetorno := 1
+                                    else
+                                      iRetorno := 0;
+                                  end
+                              else
+                                  begin
+                                    uMecaf.Ret(iRetorno,'AFRAC_AcrescimoDescontoCupom');
+                                    iRetorno := 0;
+                                  end;
+                          end
+                      else
+                         iRetorno :=1;
+                   End;
+                   //
+                   6:begin       // Urano
+                          {Parâmetros
+                        	Variavel:	Cancelar
+                        	TipoDado:	bool	Tamanho Máximo:		Obrigatório
+                        	Descricao:	Indicador de cancelamento da operação.Se este parâmetro for informado (='true'), cancela o
+                        	último desconto/acréscimo de subtotal informado. Este parâmetro tem precedência sobre os demais neste comando.
+                        	Variavel:	ValorAcrescimo
+                        	TipoDado:	money	Tamanho Máximo:		Opcional
+                        	Descricao:	Valor do desconto (quando negativo) ou acréscimo (quando positivo).Este parâmetro tem
+                        	precedência sobre o <ValorPercentual> se informado.
+                        	Variavel:	ValorPercentual
+                        	TipoDado:	money	Tamanho Máximo:		Opcional
+                        	Descricao:	Percentual de desconto (quando negativo) ou acréscimo (quando positivo), com precisão máxima
+                        	 de 2 casas decimais. Esta operação é realizada sobre o subtotal (líquido) do cupom. Este
+                        	parâmetro será desconsiderado quando usado em conjunto com o parâmetro <ValorAcrescimo>.}
+                          //
+                          If StrtoInt(Param3) > 0 Then
+                          begin
+                            Param3 := copy(Param3,1,11)+','+copy(Param3,12,2);
+                            if (Param1 = 'D') then
+                               Param3 := '-'+Param3;
+                            //
+                            if (Param2 = '$') then
+                                iRetorno := uUrano.AcresceSubtotal(nPorta, 'False', Param3, '0')
+                            Else
+                                iRetorno := uUrano.AcresceSubtotal(nPorta, 'False', '0', Param3);
+                            //
+                            frmMainEcFG2.TrataErro(iRetorno);
+                                {pchar( Param1 ),    // Acrescimo/Desconto (Valores validos : A ou D)
+                                pchar( Param2 ),    // TipoAcrescimoDesconto (Valores validos : % ou $)
+                                pchar( Param3 ) );  // Valor AcrescimoDesconto (14 por valor ou 4 percentual)}
+                            //
+                            if (iRetorno = 0) then
+                               iRetorno := 1;
+                           End
+                           Else
+                           begin
+                               {iRetorno := uUrano.AcresceSubtotal(nPorta, 'False', Param3, '0');
+                               frmMainEcFG2.TrataErro(iRetorno);}
+                               iRetorno := 1;
+                           End;
+                   End;
+             end;
+        end;
+      If (Comando = 'Pagamento') Then
+        begin
+             case modelo of
+                1:begin  // bematech
+                      // Verifica Impressora
+                      Param2 := copy(Param2,1,16);
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_EfetuaFormaPagamento(
+                                    pchar( Param2 ),    // forma de pagamento com no máximo 16 caracteres.
+                                    pchar( Param3 ) );  // valor da forma de pagamento com até 14 dígitos.
+                      iRetorno := Retorno_Impressora('Pagamento',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                End;
+                2:begin  //daruma
+                      // Verifica Impressora
+                      Param2 := copy(Param2,1,16);
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_EfetuaFormaPagamento(
+                                    pchar( Param2 ),    // forma de pagamento com no máximo 16 caracteres.
+                                    pchar( Param3 ) );  // valor da forma de pagamento com até 14 dígitos.
+                      //
+                      iRetorno := Retorno_Impressora('Pagamento',iRetorno);
+                End;
+                    //
+                3:begin  //sweda
+                    // Verifica Impressora
+                    iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                    Param2 := copy(Param2,1,15);
+                    If (iRetorno = 1) Then
+                        // FormaPag: STRING   com o nome da forma de pagamento até 15 caracteres.
+                        // ValorFPag: STRING   com o valor da forma de pagamento até 14 dígitos. Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                        iRetorno := uSweda.ECF_EfetuaFormaPagamento(
+                                 pchar( Param2 ),    // forma de pagamento com no máximo 15 caracteres.
+                                 pchar( Param3 ) );  // valor da forma de pagamento com até 14 dígitos.
+                   //
+                   iRetorno := Retorno_Impressora('Pagamento',iRetorno);
+                End;
+                //
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      Param2 := copy(Param2,1,16);
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_EfetuaFormaPagamento(
+                                    pchar( Param2 ),    // forma de pagamento com no máximo 16 caracteres.
+                                    pchar( Param3 ) );  // valor da forma de pagamento com até 14 dígitos.
+                      iRetorno := Retorno_Impressora('Pagamento',iRetorno);
+                End;
+                5:begin   //Mecaf
+                       Param2 := copy(Param2,1,16);             // sDescr, sIndice,
+                       //
+                       FillChar(sValor,17,0);
+                       FillChar(sDescr,31,0);
+                       FillChar(sMsg,81,0);
+                       FillChar(sIndice,3,0);
+                       //
+                       Param3 := copy(Param3,1,12)+'.'+copy(Param3,13,2);
+                       //
+                       StrPCopy(sValor, FloatToStrf(StrtoFloat(Param3), fffixed, 16, 2));
+                       StrPCopy(sDescr, Param2);
+                       //StrPCopy(sMsg, 'Pagamento no indice ' + Param1 );
+                       if (strtoFloat(Param1) > 0) then
+                          StrPCopy(sIndice, Param1);
+                       //
+                       iRetorno := uMecaf.AFRAC_FormaPagamento(
+                                      sDescr,        // descforma= texto que descreve a forma de pagamento. Deve estar registrado no ECF
+                                      sIndice,       // Indice=Indice da posição da forma de pagamento.
+                                      sValor,        // valor = valor da forma de pagamento informada
+                                      sMsg);         // msg = mensagem complementar a forma de pagamento
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                       {Parâmetros
+                     	Variavel:	CodMeioPagamento
+                     	TipoDado:	byte	Tamanho Máximo:		Opcional
+                     	Descricao:	Índice do meio de pagamento, sendo -2 ou um valor no intervalo entre 0 (zero) e
+                     	NUM_MEIOS_PAGAMENTO, onde: -2 representa o meio de pagamento pré-definido como
+                     	"Dinheiro"; qualquer valor do intervalo representa o índice do meio de pagamento
+                     	programável.Este parâmetro tem precedência sobre o parâmetro <NomeFormaPagamento>.
+                     	Variavel:	NomeMeioPagamento
+                     	TipoDado:	string	Tamanho Máximo:	16	Opcional
+                     	Descricao:	Nome do meio de pagamento.
+                     	Variavel:	TextoAdicional
+                     	TipoDado:	string	Tamanho Máximo:	80	Opcional
+                     	Descricao:	Texto adicional explicativo referente a operação.
+                     	Variavel:	Valor
+                     	TipoDado:	money	Tamanho Máximo:		Obrigatório
+                     	Descricao:	Valor da operação.Indica o montante pago com o meio de pagamento informado.}
+                      // Verifica Impressora
+                      Param2 := uFuncoes.Alltrim(copy(Param2,1,16));
+                      Param3 := InttoStr(StrtoInt(copy(Param3,1,12)))+','+copy(Param3,13,2);
+                      {iRetorno := uUrano.PagaCupom(
+                                    pchar( Param2 ),    // forma de pagamento com no máximo 16 caracteres.
+                                    pchar( Param3 ) );  // valor da forma de pagamento com até 11 dígitos.}
+                      iRetorno := 0;
+                      //
+                      //
+                      try
+                         uUrano.DLLG2_LimpaParams(0);
+                         //
+                         If (UpperCase(Param2) = 'DINHEIRO') Then
+                          begin
+                               Param1 := '-2';
+                               Param2 := 'Dinheiro';
+                               uUrano.DLLG2_AdicionaParam(0, 'CodMeioPagamento', Param1, 4);
+                          End;
+                         //
+                         uUrano.DLLG2_AdicionaParam(0, 'NomeMeioPagamento', Param2, 7);
+                         uUrano.DLLG2_AdicionaParam(0, 'Valor', Param3, 6);
+                         iRetorno := uUrano.DLLG2_ExecutaComando(0, 'PagaCupom');
+                         frmMainEcFG2.TrataErro(iRetorno);
+                      Except
+                         frmMainEcFG2.TrataErro(iRetorno);
+                      End;
+                End;
+             End; //fim-caso
+        End;  //fim - Pagamento
+        //
+      If (Comando = 'FecharCupom') Then
+        begin
+             case modelo of
+                1:begin  // bematech
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_TerminaFechamentoCupom(
+                                  pchar( Param1+Param2+Param3 ) );  // STRING com a mensagem promocional com
+                                                      //até 384 caracteres (8 linhas X 48 colunas),
+                                                      //para a impressora fiscal MP-20 FI II, e
+                                                      //320 caracteres (8 linhas X 40 colunas),
+                                                      //para a impressora fiscal MP-40 FI II.
+                      iRetorno := Retorno_Impressora('FecharCupom',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                 End;
+                 //
+                 2:begin   //daruma
+                     iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.daruma_FI_TerminaFechamentoCupom(
+                                  pchar( Param1+Param2+Param3 ) );  // STRING com a mensagem promocional com
+                                                      //até 384 caracteres (8 linhas X 48 colunas),
+                                                      //para a impressora fiscal MP-20 FI II, e
+                                                      //320 caracteres (8 linhas X 40 colunas),
+                                                      //para a impressora fiscal MP-40 FI II.
+                       iRetorno := Retorno_Impressora('FecharCupom',iRetorno);
+                    End;
+                 //
+                 3:begin  // sweda
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // Mensagem: STRING com a mensagem promocional limitada a 8 linhas,
+                          iRetorno := uSweda.ECF_TerminaFechamentoCupom(
+                                  pchar( Param1+Param2+Param3 ) );  // STRING com a mensagem promocional com
+                                                      //até 384 caracteres (8 linhas X 48 colunas),
+                                                      //para a impressora fiscal MP-20 FI II, e
+                                                      //320 caracteres (8 linhas X 40 colunas),
+                                                      //para a impressora fiscal MP-40 FI II.
+                       iRetorno := Retorno_Impressora('FecharCupom',iRetorno);
+                    End;
+                    //
+                4:begin  // Elgin
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uElgin.Elgin_TerminaFechamentoCupom(
+                                  pchar( Param1+Param2+Param3 ) );  // STRING com a mensagem promocional com
+                                                      //até 384 caracteres (8 linhas X 48 colunas),
+                                                      //para a impressora fiscal MP-20 FI II, e
+                                                      //320 caracteres (8 linhas X 40 colunas),
+                                                      //para a impressora fiscal MP-40 FI II.
+                      iRetorno := Retorno_Impressora('FecharCupom',iRetorno);
+                 End;
+                 5:Begin    // Mecaf
+                         // Fechamento de cupom
+                   iRetorno  := uMecaf.AFRAC_FecharCupom('0', Pchar(Param1+Param2+Param3));
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                 End;
+                 //
+                 6:begin       // Urano
+                       {Parâmetros
+                     	Variavel:	Operador
+                     	TipoDado:	string	Tamanho Máximo:	8	Opcional
+                     	Descricao:	Identificação do operador.
+                     	Variavel:	TextoPromocional
+                     	TipoDado:	string	Tamanho Máximo:	492	Opcional
+                     	Descricao:	Texto da mensagem promocional a ser impressa.O caracter ASCII 10 ('\n' ou line feed) é
+                     	interpretado como separador de linhas do texto promocional. }
+                       iRetorno := uUrano.EncerraDocumento(nPorta, ' ', Param1+Param2+Param3);
+                       frmMainEcFG2.TrataErro(iRetorno);
+                       //
+                       if (iRetorno = 0) then
+                        begin
+                           iRetorno := 1;
+                           //
+                           try
+                             uUrano.DLLG2_LimpaParams(0);
+                             uUrano.DLLG2_AdicionaParam(0, 'Avanco', '200', 4);
+                             uUrano.DLLG2_ExecutaComando(0, 'AvancaPapel');
+                             iRetorno := 1;
+                           Except
+                              iRetorno := 0;
+                           End;
+                        End;   
+                 End;
+
+            End;  //fim-caso
+        End;  // fim-FecharCupom
+        //
+       If (Comando = 'NumeroCupom') Then
+         begin
+             case modelo of
+                1:begin  // bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      NumeroCupom := uFuncoes.Replicate(' ',6);
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_NumeroCupom( NumeroCupom );
+                      //iRetorno := Retorno_Impressora('NumeroCupom',iRetorno);
+                      mRetorno := Retorno_Impressora('NumeroCupom',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                     // aMensagem := mRetorno;
+                End;
+                //
+                2:begin   //daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      NumeroCupom := uFuncoes.Replicate(' ',6);
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_NumeroCupom( NumeroCupom );
+                      mRetorno := Retorno_Impressora('NumeroCupom',iRetorno);
+                End;
+                //
+                3:begin  //Sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      NumeroCupom := uFuncoes.Replicate(' ',6);
+                      If (iRetorno = 1) Then
+                           // NumCupom:  STRING com 6 posições para receber o número do último  cupom.    Ele  é  impresso  após  a  legenda “COO: ” - Contador de Ordem de Operação.
+                           iRetorno := uSweda.ECF_NumeroCupom(Pchar(NumeroCupom) );
+                      mRetorno := Retorno_Impressora('NumeroCupom',iRetorno);
+                 End;
+                 //
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      NumeroCupom := uFuncoes.Replicate(' ',6);
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_NumeroCupom( NumeroCupom );
+                      //iRetorno := Retorno_Impressora('NumeroCupom',iRetorno);
+                      mRetorno := Retorno_Impressora('NumeroCupom',iRetorno);
+                     // aMensagem := mRetorno;
+                End;
+                5:begin   // Mecaf
+                     iRetorno := uMecaf.NumeroCupom(NumeroCupom);
+                     mRetorno := StrtoInt(NumeroCupom);
+                     if (iRetorno = 0) then
+                        iRetorno := 1
+                      else
+                        iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                      {Retornos
+                    	Variavel:	ValorInteiro
+                    	TipoDado:	long	Tamanho Máximo:		Obrigatório
+                    	Descricao:	Valor inteiro.
+                      Parâmetros
+                    	Variavel:	NomeInteiro
+                    	TipoDado:	string	Tamanho Máximo:	50	Obrigatório
+                    	Descricao:	Nome da variável inteira solicitada conforme anexo à especificação do protocolo.Quando este
+                    	parâmetro referenciar um vetor, o índice do vetor deve ser identificado entre colchetes '[]' após o nome. }
+                      iRetorno := uUrano.LeInteiro(nPorta, 'COO', NumeroCupom);
+                      frmMainEcFG2.TrataErro(iRetorno);
+                      if (iRetorno = 0) then
+                            iRetorno := 1;
+                End;
+             End;     //fim-caso
+         End;  // fim-NumeroCupom
+         //
+       If (Comando = 'AbreComprovanteNaoFiscalVinculado') Then
+         begin
+             case modelo of
+                1:begin  // bematech
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      Param1   := copy(Param1,1,16);
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_AbreComprovanteNaoFiscalVinculado(pchar( Param1 ),pchar(''),pchar(''));
+                      iRetorno := Retorno_Impressora('AbreComprovanteNaoFiscalVinculado',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                End;
+                2:begin   // daruma
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      Param1   := copy(Param1,1,16);
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_AbreComprovanteNaoFiscalVinculado(pchar( Param1 ),pchar(''),pchar(''));
+                    End;
+                3:begin  // sweda
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      Param1   := copy(Param1,1,15);
+                      If (iRetorno = 1) Then
+                           iRetorno := uSweda.ECF_AbreComprovanteNaoFiscalVinculado(pchar( Param1 ),pchar(''),pchar(''));
+                End;
+                4:begin  // Elgin
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      Param2 := uFuncoes.StrZero(Param2,13);
+                      //
+                      Param1 := copy(Param1,1,16);
+                      Param2 := InttoStr(StrtoInt(copy(Param2,1,11)))+','+copy(Param2,12,2);
+                      //
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_AbreComprovanteNaoFiscalVinculado(pchar( Param1 ), pchar( Param2 ),pchar(''));
+                End;
+                5:begin     // mecaf
+                       {Descrição: Abre Não fiscal não Vinculado
+                       Observação: Em algumas impressoras não terá efeito de impressão. Esta impressão será
+                       contemplada na informação do valor na função AFRAC_RegistrarNãoFiscal
+                       NOME ANTIGO: AFRAC_Sangria(nome_totalizador: ttexto[20];
+                       valor: tpontoflutuante;
+                       mensagem: ttexto[255] ): inteiro   }
+                       iRetorno := uMecaf.AFRAC_AbrirNaoFiscalNaoVinculado();
+                       if (iRetorno = 0) then
+                         iRetorno := 1
+                       else
+                          iRetorno := 0;
+                End;
+                //
+                   6:begin       // Urano
+                         {Parâmetros
+                       	Variavel:	EnderecoConsumidor
+                       	TipoDado:	string	Tamanho Máximo:	80	Opcional
+                       	Descricao:	Endereço do consumidor.
+                       	Variavel:	IdConsumidor
+                       	TipoDado:	string	Tamanho Máximo:	29	Opcional
+                       	Descricao:	Identificação do consumidor.
+                       	Variavel:	NomeConsumidor
+                       	TipoDado:	string	Tamanho Máximo:	30	Opcional
+                       	Descricao:	Nome do consumidor. }
+                        Param1   := uFuncoes.Alltrim(copy(Param1,1,16));
+                        //
+                        try
+                            // iRetorno := uUrano.AbreCupomNaoFiscal(nPorta, Param1, ' ', ' ');
+                            uUrano.DLLG2_LimpaParams(0);
+                            //valores opcionais, mas se declarados não podem ser deixados em branco
+                            {uUrano.DLLG2_AdicionaParam(0, 'COO', edit17.Text, 100);
+                            uUrano.DLLG2_AdicionaParam(0, 'NumParcelas', edit18.Text, 10);
+                            uUrano.DLLG2_AdicionaParam(0, 'Valor', edit20.Text, 6);}
+                            If not uFuncoes.Empty(Param1) Then
+                               uUrano.DLLG2_AdicionaParam(0, 'NomeMeioPagamento', Param1, 7);
+                            //
+                            iRetorno := uUrano.DLLG2_ExecutaComando(0, 'AbreCreditoDebito');
+                            frmMainEcFG2.TrataErro(iRetorno);
+                            //
+                            if (iRetorno = 0) then
+                               iRetorno := 1;
+                        Except
+                             frmMainEcFG2.TrataErro(iRetorno);
+                        End;
+                        //
+                   End;
+
+           End;  //fim-caso
+         End;       // fim-AbreComprovanteNaoFiscalVinculado
+      //
+      If (Comando = 'UsaComprovanteNaoFiscalVinculado') Then
+      begin
+             case modelo of
+                1:begin  // bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_UsaComprovanteNaoFiscalVinculado(pchar( aTextoTef ));
+                      iRetorno := Retorno_Impressora('UsaComprovanteNaoFiscalVinculado',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                End;
+                2:begin  //daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_UsaComprovanteNaoFiscalVinculado(pchar( aTextoTef ));
+                  End;
+                3:begin  // sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           // Texto: STRING com o texto a ser impresso no comprovante não fiscal vinculado com até 618 caracteres.
+                           iRetorno := uSweda.ECF_UsaComprovanteNaoFiscalVinculado(pchar( aTextoTef ));
+                 End;
+                 //
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_UsaComprovanteNaoFiscalVinculado(pchar( aTextoTef ));
+                      iRetorno := Retorno_Impressora('UsaComprovanteNaoFiscalVinculado',iRetorno);
+                End;
+                5: begin
+                      {Quando enviado este comando, o ECF deve imprimir a linha.
+                      A segunda linha (opcional) para otimizar a impressão bidirecional.
+                      Se não for possível imprimir o conteúdo da linha enviada em uma única linha
+                      do ECF, o restante do texto deve ser impresso na próxima linha.}
+                      iRetorno := uMecaf.AFRAC_ImprimirVinculado(
+                                pchar( aTextoTef ),      // linha1: ttexto[48]; - Linha1 = linha a ser impressa no cupom não fiscal vinculado
+                                pchar( Param1 ));        // linha2: ttexto[48]; - Linha2 = Opcional, segunda linha a ser impressa.
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                       //
+                       DLLG2_LimpaParams(nPorta);
+                       dLLG2_AdicionaParam(nPorta,'TextoLivre' , PChar(aTextoTef) ,7);
+                       iRetorno := uUrano.DLLG2_ExecutaComando(nPorta,'ImprimeTexto');
+                       frmMainEcFG2.TrataErro(iRetorno);
+                       if (iRetorno = 0) then
+                        begin
+                           iRetorno := 1;
+                           //   nova alteracao
+                           {iRetorno := uUrano.DLLG2_ExecutaComando(nPorta,'EmiteViaCreditoDebito');
+                           frmMainEcFG2.TrataErro(iRetorno);
+                           //
+                           if (iRetorno = 0) then
+                               iRetorno := 1
+                           Else
+                               iRetorno := 0;}
+                        End
+                       else
+                          iRetorno := 0;
+                End;
+             End;  // fim-caso
+      End;   // fim-UsaComprovanteNaoFiscalVinculado
+      //
+      If (Comando = 'FechaComprovanteNaoFiscalVinculado') Then
+        begin
+             case modelo of
+                1:begin  // bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_FechaComprovanteNaoFiscalVinculado();
+                      iRetorno := Retorno_Impressora('FechaComprovanteNaoFiscalVinculado',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                End;
+                //
+                2:begin  // daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_FechaComprovanteNaoFiscalVinculado();
+                 End;
+                3:begin   //sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uSweda.ECF_FechaComprovanteNaoFiscalVinculado();
+                 End;
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_FechaComprovanteNaoFiscalVinculado();
+                      iRetorno := Retorno_Impressora('FechaComprovanteNaoFiscalVinculado',iRetorno);
+                End;
+                5:Begin
+                      {O ECF somente poderá retornar sucesso se todas as linhas foram impressas.
+                      Esta função também deverá limpar os dados armazenados através das
+                      funções AFRAC_007 a AFRAC_014.}
+                      iRetorno := uMecaf.AFRAC_FecharVinculado();
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                End;
+                //
+                6:begin
+                      // Urano
+                      DLLG2_LimpaParams(nPorta);
+                      iRetorno := uUrano.DLLG2_ExecutaComando(nPorta,'EncerraDocumento');
+                      frmMainEcFG2.TrataErro(iRetorno);
+                      if (iRetorno = 0) then
+                       begin
+                           iRetorno := 1;
+                           //
+                           try
+                             uUrano.DLLG2_LimpaParams(0);
+                             uUrano.DLLG2_AdicionaParam(0, 'Avanco', '200', 4);
+                             uUrano.DLLG2_ExecutaComando(0, 'AvancaPapel');
+                             iRetorno := 1;
+                           Except
+                              iRetorno := 0;
+                           End;
+                       End
+                      else
+                         iRetorno := 0;
+                End;
+
+             End; // fim-caso
+        End;
+      //
+      If (Comando = 'AbreRelatorioGerencial') Then
+      begin
+             case modelo of
+                1:begin  // bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                           // aqui
+                           If uFuncoes.Empty(Param1) Then
+                               Param1 := '5';
+                           iRetorno := uBematech.Bematech_FI_AbreRelatorioGerencialMFD(pchar(Param1));
+                           uBematech.Analisa_iRetorno;
+                           //
+                           aMensagem := uBematech.aMensagem;
+                       End;
+                End;
+                2:begin   // daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_AbreRelatorioGerencial();
+                End;
+                3:begin   //sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           // Texto: STRING com o texto a ser impresso no relatório até 618 caracteres.
+                           iRetorno := uSweda.ECF_AbreRelatorioGerencialMFD(pchar(''));
+                End;
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      // Abre o primeiro Relatório Gerencial localizado, imprimindo seu cabeçalho e nome.
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_AbreRelatorioGerencial;
+                End;
+                5:begin    // Mecaf
+                      {Para o convênio 156, o campo índice deverá ser preenchido com caracteres
+                      em branco, ou nulos.}
+                      // Ïndice = índice do relatório gerencial, indicando o tipo do relatório (Convênio 50).
+                      iRetorno := uMecaf.AFRAC_AbrirRelatorioGerencial(PChar(Param1));
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                       {Parâmetros
+                     	Variavel:	CodGerencial
+                     	TipoDado:	byte	Tamanho Máximo:		Opcional
+                     	Descricao:	Índice do relatório gerencial entre 0 e NUM_GERENCIAIS.Este parâmetro tem precedência a
+                     	<NomeGerencial>.
+                     	Variavel:	NomeGerencial
+                     	TipoDado:	string	Tamanho Máximo:	30	Opcional
+                     	Descricao:	Nome do relatório gerencial.}
+                      uUrano.dLLG2_LimpaParams(nPorta);
+                      uUrano.dLLG2_AdicionaParam(nPorta,'CodGerencial' , Param1,4);
+                      //
+                      iRetorno := uUrano.DLLG2_ExecutaComando(nPorta,'AbreGerencial');
+                      frmMainEcFG2.TrataErro(iRetorno);
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;  
+                End;
+                //
+              End;    // fim-caso
+      End;
+
+      If (Comando = 'RelatorioGerencial') Then
+      begin
+             case modelo of
+                1:begin  // bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                       begin
+                           iRetorno := uBematech.Bematech_FI_RelatorioGerencial(pchar( aTextoTef ));
+                           uBematech.Analisa_iRetorno;
+                           //
+                           aMensagem := uBematech.aMensagem;
+                       End;
+                End;
+                2:begin   // daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_RelatorioGerencial(pchar( aTextoTef ));
+                End;
+                3:begin   //sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           // Texto: STRING com o texto a ser impresso no relatório até 618 caracteres.
+                           iRetorno := uSweda.ECF_RelatorioGerencial(pchar( aTextoTef ));
+                End;
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_RelatorioGerencial(pchar( aTextoTef ));
+                End;
+                5:begin    // Mecaf
+                      // Imprime uma linha no relatório gerencial
+                      iRetorno := uMecaf.AFRAC_ImprimirRelatorioGerencial(PChar(aTextoTef));  // linha = linha a ser impressa na relatório gerencial - linha: ttexto[160]
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                       dLLG2_AdicionaParam(nPorta,'TextoLivre' , aTextoTef ,7);
+                       iRetorno := uUrano.DLLG2_ExecutaComando(nPorta,'ImprimeTexto');
+                       frmMainEcFG2.TrataErro(iRetorno);
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                End;
+                //
+              End;    // fim-caso
+      End;
+      //
+      If (Comando = 'FechaRelatorioGerencial') Then
+       begin
+             case modelo of
+                1:begin  // bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_FechaRelatorioGerencial();
+                      iRetorno := Retorno_Impressora('FechaRelatorioGerencial',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                End;
+                2:begin   // daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_FechaRelatorioGerencial();
+                End;
+                3:begin  // sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uSweda.ECF_FechaRelatorioGerencial();
+                End;
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uElgin.Elgin_FechaRelatorioGerencial();
+                End;
+                5:begin    // Mecaf
+                      // Finaliza o relatório gerencial
+                      iRetorno := uMecaf.AFRAC_FecharRelatorioGerencial();
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                     iRetorno := uUrano.DLLG2_ExecutaComando(nPorta,'EncerraDocumento');
+                     frmMainEcFG2.TrataErro(iRetorno);
+                      if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+                End;
+             End; // fim-case
+        End;
+      //
+      If (Comando = 'LeituraMemoriaFiscalReducao') Then
+        begin
+             case modelo of
+                1:begin  // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // CRZInic: STRING com o número da redução inicial até 4 dígitos.
+                          //  CRZFim: STRING com o número da redução final até 4 dígitos.
+                          iRetorno := uBematech.Bematech_FI_LeituraMemoriaFiscalReducao(pchar(param1), pchar(param2));
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                End;
+                //
+                2:begin  // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // CRZInic: STRING com o número da redução inicial até 4 dígitos.
+                          //  CRZFim: STRING com o número da redução final até 4 dígitos.
+                          iRetorno := uDaruma.Daruma_FI_LeituraMemoriaFiscalReducao(pchar(param1), pchar(param2));
+                End;
+                //
+                3:begin  // sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // CRZInic: STRING com o número da redução inicial até 4 dígitos.
+                          //  CRZFim: STRING com o número da redução final até 4 dígitos.
+                           iRetorno := uSweda.ECF_LeituraMemoriaFiscalReducao(pchar(param1), pchar(param2));
+                End;
+                //
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // CRZInic: STRING com o número da redução inicial até 4 dígitos.
+                          //  CRZFim: STRING com o número da redução final até 4 dígitos.
+                          iRetorno := uElgin.Elgin_LeituraMemoriaFiscalReducao(pchar(param1), pchar(param2) , pchar('c'));
+                End;
+                5:begin     //Mecaf
+                       {Se tipo for 0, o intervalo inicio e final é ignorado. Se for por data, deve ser no
+                       formato ddmmaaaa. Se for por redução, deve ser números com zeros à
+                       esquerda.}
+                       iRetorno := uMecaf.AFRAC_EmitirLeituraMemoriaFiscal('2', pchar(param1), pchar(param2));
+                       if (iRetorno = 0) then
+                          iRetorno := 1
+                       else
+                          iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                     if (iRetorno = 0) then
+                         iRetorno := 1
+                      else
+                         iRetorno := 0;
+
+                End;
+             End;
+        End;         // fim-LeituraMemoriaFiscalReducao
+     //
+     if  (Comando = 'Sangria') Then
+      begin
+             case modelo of
+                1:begin  // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // Valor: STRING com o Valor da sangria com até 14 dígitos (duas casas decimais). Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                           iRetorno := uBematech.Bematech_FI_Sangria(pchar(param1));
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                End;
+                2:begin  // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // Valor: STRING com o Valor da sangria com até 14 dígitos (duas casas decimais). Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                           iRetorno := uDaruma.Daruma_FI_Sangria(pchar(param1));
+                End;
+                3:begin  // sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // Valor: STRING com o Valor da sangria com até 14 dígitos (duas casas decimais). Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                           iRetorno := uSweda.ECF_Sangria(pchar(param1));
+                End;
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // Valor: STRING com o Valor da sangria com até 14 dígitos (duas casas decimais). Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                           iRetorno := uElgin.Elgin_Sangria(pchar(param1));
+                End;
+                5:begin     // mecaf
+                     iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                     iRetorno := 0;
+                End;
+             End;
+      End;
+      //
+      if (Comando = 'Suprimento') Then
+        begin
+             case modelo of
+                1:begin  // Bematech
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // Valor:  STRING   com o Valor do suprimento até 14 dígitos (duas casas decimais). Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                          // FormaPag:  STRING   com o nome do meio de pagamento até 15 caracteres. Se o nome da forma de pagamento não for informado, o suprimento será feito em Dinheiro.
+                           iRetorno := uBematech.Bematech_FI_Suprimento(pchar(Param1), pchar(Param2));
+                      uBematech.Analisa_iRetorno;
+                      //
+                      aMensagem := uBematech.aMensagem;
+                End;
+                2:begin  // Daruma
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // Valor:  STRING   com o Valor do suprimento até 14 dígitos (duas casas decimais). Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                          // FormaPag:  STRING   com o nome do meio de pagamento até 15 caracteres. Se o nome da forma de pagamento não for informado, o suprimento será feito em Dinheiro.
+                           iRetorno := uDaruma.Daruma_FI_Suprimento(pchar(Param1), pchar(Param2));
+                End;
+                3:begin  // sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // Valor:  STRING   com o Valor do suprimento até 14 dígitos (duas casas decimais). Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                          // FormaPag:  STRING   com o nome do meio de pagamento até 15 caracteres. Se o nome da forma de pagamento não for informado, o suprimento será feito em Dinheiro.
+                           iRetorno := uSweda.ECF_Suprimento(pchar(Param1), pchar(Param2));
+                End;
+                4:begin  // Elgin
+                      // Verifica Impressora
+                      iRetorno := uElgin.Elgin_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          // Valor:  STRING   com o Valor do suprimento até 14 dígitos (duas casas decimais). Se o ponto e a vírgula forem informados no valor eles serão  ignorados.
+                          // FormaPag:  STRING   com o nome do meio de pagamento até 15 caracteres. Se o nome da forma de pagamento não for informado, o suprimento será feito em Dinheiro.
+                           iRetorno := uElgin.Elgin_Suprimento(pchar(Param1), pchar(Param2));
+                End;
+                5:begin   // Mecaf
+                      iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                      iRetorno := 0;
+                End;
+             End;
+        End;
+       //
+      //
+      if (Comando = 'ProgramaFormasPagamento') Then
+        begin
+             case modelo of
+                1:begin  // Bematech
+                      iRetorno := 1;
+                End;
+                2:begin  // Daruma
+                      iRetorno := 1;
+                End;
+                3:begin  // sweda
+                      // Verifica Impressora
+                      iRetorno := uSweda.ECF_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           // Inclui várias formas de pagamento.
+                           // TabFormaPag:  STRING   onde   são   informados   o   nome de
+                           // cada  forma   de  pagamento  separada  por vírgula ou
+                           // PONTO-E-VÍRGULA. O nome deve ter até 16 caracteres.
+                           iRetorno := uSweda.ECF_ProgramaFormasPagamento( pchar(Param1));
+                End;
+                4:begin  // Elgin
+                      iRetorno := 1;
+                End;
+                5:begin   // Mecaf
+                      iRetorno := 0;
+                End;
+                //
+                6:begin       // Urano
+                       {Retornos
+	                     Variavel:	CodMeioPagamentoProgram
+                     	TipoDado:	byte	Tamanho Máximo:		Obrigatório
+                     	Descricao:	Índice do meio de pagamento programável entre 0 (zero) e NUM_MEIOS_PAGAMENTO.Retorna o
+                     	índice do meio de pagamento programado.
+                      Parâmetros
+                     	Variavel:	CodMeioPagamentoProgram
+                     	TipoDado:	byte	Tamanho Máximo:		Opcional
+                     	Descricao:	Índice do meio de pagamento programável entre 0 (zero) e NUM_MEIOS_PAGAMENTO.Identifica o
+                     	meio de pagamento a ser definido ou redefinido. Quando não informado, procura pelo próximo
+                     	índice disponível.
+                     	Variavel:	DescricaoMeioPagamento
+                     	TipoDado:	string	Tamanho Máximo:	80	Opcional
+                     	Descricao:	Texto associado a este meio de pagamento em particular. De livre uso do programa aplicativo.
+                     	Variavel:	NomeMeioPagamento
+                     	TipoDado:	string	Tamanho Máximo:	16	Obrigatório
+                     	Descricao:	Nome do meio de pagamento.Identifica o nome do meio de pagamento sempre que o parâmetro
+                     	<CodMeioPagamentoProgram> não for informado.
+                     	Variavel:	PermiteVinculado
+                     	TipoDado:	bool	Tamanho Máximo:		Opcional
+                     	Descricao:	Informa se permite a emissão de cupons crédito/débito relativos ao meio de pagamento
+                     	definido.Se este campo não for informado neste comando, seu valor será definido após a
+                     	primeira utilização do respectivo meio de pagamento.}
+                      //iRetorno := uUrano.DefineMeioPagamento(nPorta, 'T', ' ', Param1, ' ');
+                End;
+             End;
+        End;
+      // retorno
+      result := iRetorno;
+End;
+
+// **********************************************************************
+// -------------------- Analisa Retorno da impressora ---------------------
+function Retorno_Impressora( nComando : String; iRetorno : integer) : Integer;
+Var
+   iACK, iST1, iST2: Integer;
+   Status, strErroMsg : String;
+   //strErroMsg : char;
+Begin
+    aStatus := 'OK';
+    result  := iRetorno;
+    //
+    if (iRetorno = 1) then
+       begin
+         iACK := 0; iST1 := 0; iST2 := 0;
+         result := 0;
+         //
+         Case uPrincipalECFG2.M_CDMODE of
+            1: uBematech.Bematech_FI_RetornoImpressora(iACK, iST1, iST2);  // Bematech
+            2: uDaruma.Daruma_FI_RetornoImpressora(iACK, iST1, iST2);      // daruma
+            3: uSweda.ECF_RetornoImpressora(iACK, iST1, iST2);             // sweda
+            4: begin                                                       // Elgin
+               iACK := 6; iST1 := 0; iST2 := 0;
+               end;
+            5:begin                                                        // Mecaf
+               //uMecaf
+            End;
+         End;
+         //
+         if (iACK = 6) and (iST1 = 0) and (iST2 = 0) then
+            result :=1
+         else
+            result :=0;
+
+         If iACK = 6 then                    // Byte indicativo de Recebimento Correto.
+         Begin
+               // Verifica ST1
+
+               IF iST1 >= 128 Then
+                    Begin
+                    iST1 := iST1 - 128;
+                    aMensagem := 'Fim de Papel!!!'+ nComando ;
+               END;
+               IF iST1 >= 64  Then
+               begin
+                    iST1 := iST1 - 64;
+                    aMensagem := 'Pouco Papel!!! '+nComando;
+               End;
+               IF iST1 >= 32  Then
+               Begin
+                    iST1 := iST1 - 32;
+                    aMensagem := 'Erro no Relógio!!! '+nComando;
+               End;
+               IF iST1 >= 16  Then
+               Begin
+                    iST1 := iST1 - 16;
+                    aMensagem := 'Impressora em ERRO!!! '+nComando;
+               End;
+               IF iST1 >= 8   Then
+               Begin
+                    iST1 := iST1 - 8;
+                    aMensagem := 'CMD não iniciado com ESC!!! '+nComando;
+               End;
+               IF iST1 >= 4   Then
+               Begin
+                     iST1 := iST1 - 4;
+                     aMensagem := 'Comando Inexistente!!! '+nComando;
+               End;
+               IF iST1 >= 2   Then
+               Begin
+                    iST1 := iST1 - 2;
+                    aMensagem := 'Cupom Aberto!!! '+nComando;
+               End;
+               IF iST1 >= 1   Then
+               Begin
+                    iST1 := iST1 - 1;
+                    aMensagem := 'Nº de Parâmetros Inválidos!!! '+nComando;
+              End;
+
+               // Verifica ST2
+
+               IF iST2 >= 128 Then
+               Begin
+                    iST2 := iST2 - 128;
+                    aMensagem := 'Tipo de Parâmetro Inválido!!! '+nComando;
+               End;
+               IF iST2 >= 64  Then
+               Begin
+                    iST2 := iST2 - 64;
+                    aMensagem := 'Memória Fiscal Lotada!!! '+nComando;
+               END;
+               IF iST2 >= 32  Then
+               Begin
+                    iST2 := iST2 - 32;
+                    aMensagem := 'CMOS não Volátil!!! '+nComando;
+               END;
+               IF iST2 >= 16  Then
+               Begin
+                    iST2 := iST2 - 16;
+                    aMensagem := 'Alíquota Não Programada!!! '+nComando;
+               END;
+               IF iST2 >= 8   Then
+               Begin
+                    iST2 := iST2 - 8;
+                    aMensagem := 'Alíquota lotadas!!! '+nComando;
+               End;
+               IF iST2 >= 4   Then
+               Begin
+                    iST2 := iST2 - 4;
+                    aMensagem := 'Cancelamento não Permitido!!! '+nComando;
+               END;
+               IF iST2 >= 2   Then
+               Begin
+                    iST2 := iST2 - 2;
+                    aMensagem := 'CGC/IE não Programados!!! '+nComando;
+               END;
+               IF iST2 >= 1   Then
+               Begin
+                    iST2 := iST2 - 1;
+                    aMensagem := Status;
+               END;
+         End;
+
+         If iACK = 21 Then
+            Begin                     // Byte indicativo de Recebimento incorreto.
+                 aMensagem := 'Atenção!!!' + #13 + #10 +
+                        'A Impressora retornou NAK. O programa será abortado.';
+                 Exit;
+            End;
+          //
+          aStatus := aMensagem;
+       End
+       Else
+       begin
+         Case uPrincipalECFG2.M_CDMODE of
+            1: begin  // bematech
+                 aMensagem := 'Erro ao tentar se comunicar com ECF';
+                 aStatus := aMensagem;
+               end;
+            2: begin  // daruma
+                 aMensagem := 'Erro ao tentar se comunicar com ECF';
+                 aStatus := aMensagem;
+               end;
+            3: begin // sweda
+                 aMensagem := 'Erro ao tentar se comunicar com ECF';
+                 aStatus := aMensagem;
+               end;
+            4: begin  // elgin
+                 strErroMsg := StringOfChar(' ',1024);
+                 iRetorno := uElgin.Elgin_RetornoImpressora(iACK, strErroMsg);
+                 aMensagem := PChar(strErroMsg);
+                 aStatus := aMensagem;
+               end;
+         End;
+
+       End;
+
+end;
+
+
+end.

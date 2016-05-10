@@ -1,0 +1,41 @@
+program InfoECFG2;
+
+uses
+  Forms,
+  Windows,
+  Dialogs,
+  uPrincipalECFG2 in 'uPrincipalECFG2.pas' {frmMainEcFG2},
+  uSobre in 'uSobre.pas' {frmSobre},
+  uFiscal in 'uFiscal.pas',
+  uBematech in 'uBematech.pas',
+  uDaruma in 'uDaruma.pas',
+  uFuncoes in 'uFuncoes.pas',
+  uSweda in 'uSweda.pas',
+  uFrmTesteImp in 'uFrmTesteImp.pas' {frmTesteImp},
+  uFrmConfPasta in 'uFrmConfPasta.pas' {frmConfPasta},
+  ufrmNewSobre in 'ufrmNewSobre.pas' {frmNewSobre},
+  uFrmTestaImpressora in 'uFrmTestaImpressora.pas' {frmTestarImpressora},
+  uElgin in 'uElgin.pas',
+  uMecaf in 'uMecaf.pas',
+  uUrano in 'uUrano.pas',
+  uFrmMemoriaFiscal in 'uFrmMemoriaFiscal.pas' {frmMemoriaFiscal};
+
+{$R *.res}
+Var
+   hMutex : LongWord;
+
+begin
+    hMutex := CreateMutex(nil,False,'OneInstance');
+
+    if WaitForSingleObject(hMutex,0) <> WAIT_TIMEOUT then
+    begin
+         Application.Initialize;
+         Application.ShowMainForm := False;         // <==== aqui.
+         Application.CreateForm(TfrmMainEcFG2, frmMainEcFG2);
+  Application.CreateForm(TfrmMemoriaFiscal, frmMemoriaFiscal);
+  Showwindow(application.handle,sw_hide);    // <== Este oculta da TaskBar
+         Application.Run;
+    End
+    else
+        MessageDlg('Aplicativo já está sendo executado!!!', mtInformation, [mbOK], 0);
+end.
