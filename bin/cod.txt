@@ -1,0 +1,50 @@
+var
+  sCod : array[0..20] of char;
+  sDescr : array[0..200] of char;
+  sAliq : array[0..5] of char;
+  sQtd : array[0..16] of char;
+  sValor : array[0..16] of char;
+  sAcreDesc : array[0..1] of char;
+  sPercVl : array[0..1] of char;
+  sDesc : array[0..16] of char;
+  sImp1L : array[0..1] of char;
+  sUnid : array[0..3] of char;
+  sTotal : array[0..16] of char;
+
+begin
+
+  FillChar(sCod,21,0);
+  Fillchar(sDescr,201,0);
+  Fillchar(sAliq,6,0);
+  Fillchar(sQtd,17,0);
+  Fillchar(sValor,17,0);
+  Fillchar(sAcreDesc,2,0);
+  Fillchar(sPercVl,2,0);
+  Fillchar(sDesc,17,0);
+  Fillchar(sImp1L,2,0);
+  Fillchar(sUnid,4,0);
+  FillChar(sTotal,17,0);
+
+  StrPCopy(sCod,Codigo);
+  StrPCopy(sDescr,descricao);
+  StrPCopy(sQtd,FloatToStrf(qtd, fffixed, 16,2));
+  StrPCopy(sValor, FloatToStrf(valor, fffixed, 16, 2));
+  StrPCopy(sAcreDesc,AcreDesc);
+  StrPCopy(sPercVl,PercVl);
+  StrPCopy(sDesc, Desc);
+  StrPCopy(sUnid,'UN');
+  StrPCopy(sImp1L,'0');
+  StrPCopy(sTotal,'0');
+
+if (servico) then begin
+     StrPCopy(sAliq, Aliq)
+  end
+  else begin
+    if pos(Aliq[1],'IFN') > 0 then StrPCopy(sAliq,'M' + Aliq[1] + '00')
+    else if pos(Aliq[1],'J') > 0 then StrPCopy(sAliq,Aliq)
+    else StrPCopy(sAliq,'M'+'T' + Aliq)
+  end;  
+
+
+  Result:= Ret(AFRAC_VenderItem(sCod, sDescr, sQtd,
+               sValor, sAcreDesc, sPercVl, sDesc,  sTotal, sAliq, sUnid,sImp1L), 'AFRAC_VenderItem');

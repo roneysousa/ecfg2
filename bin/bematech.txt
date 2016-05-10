@@ -1,0 +1,284 @@
+EMULFITH vs 1.02
+Emulador da Impressora Fiscal Termica Bematech.
+ 
+Bematech Ind. e Com. de Equip. Eletronicos S.A.
+Estrada de Santa Candida, 263  82.630-490
+Curitiba - Parana - Brasil
+
+CNPJ:82.373.077/0001-71  
+IE:10181465-30                             UF:PR
+------------------------------------------------
+04/11/2008 09:49:08   CCF:000001      COO:000004
+------------------------------------------------
+      CUPOM FISCAL      
+ITEM   CÓDIGO             DESCRIÇÃO
+QTD.UN. VL UNITÁRIO( R$)  ST        VL ITEM( R$)
+------------------------------------------------
+001 0000000000001                        ADFADFD
+         1 X 0,05       T18,00%            0,05g
+002 0000000000017                   CARNE BOVINA
+         2 X 12,50      T18,00%           25,00g
+                              ------------------
+TOTAL  R$                                 25,05
+DINHEIRO                                  25,05
+------------------------------------------------
+VENDEDOR.: 000001                               
+CAIXA....: 000                                  
+No PEDIDO: 0000025                              
+------------------------------------------------
+BEMATECH        MP-2000 TH FI        ECF-IF 
+ECF:001 LJ:0001                  VERSÃO:01.00.00
+FAB:EMULADOR                04/11/2008 09:50:10 
+QQQQQQQQQQQQQQEYQY                          BR
+------------------------------------------------
+
+
+
+
+Bematech Ind. e Com. de Equip. Eletronicos S.A.
+Estrada de Santa Candida, 263  82.630-490
+Curitiba - Parana - Brasil
+
+CNPJ:82.373.077/0001-71  
+IE:10181465-30                             UF:PR
+------------------------------------------------
+04/11/2008 09:51:02   CCF:000002      COO:000005
+------------------------------------------------
+      CUPOM FISCAL      
+ITEM   CÓDIGO             DESCRIÇÃO
+QTD.UN. VL UNITÁRIO( R$)  ST        VL ITEM( R$)
+------------------------------------------------
+001 0000000000007                       VELA IGN
+         1 X 10,00         F1             10,00g
+-------------CUPOM FISCAL CANCELADO-------------
+------------------------------------------------
+BEMATECH        MP-2000 TH FI        ECF-IF 
+ECF:001 LJ:0001                  VERSÃO:01.00.00
+FAB:EMULADOR                04/11/2008 09:51:19 
+QQQQQQQQQQQQQQRYQY                          BR
+------------------------------------------------
+
+
+
+
+Bematech Ind. e Com. de Equip. Eletronicos S.A.
+Estrada de Santa Candida, 263  82.630-490
+Curitiba - Parana - Brasil
+
+CNPJ:82.373.077/0001-71  
+IE:10181465-30                             UF:PR
+------------------------------------------------
+04/11/2008 09:51:41   CCF:000003      COO:000006
+------------------------------------------------
+      CUPOM FISCAL      
+ITEM   CÓDIGO             DESCRIÇÃO
+QTD.UN. VL UNITÁRIO( R$)  ST        VL ITEM( R$)
+------------------------------------------------
+001 0000000000023                         TESTE2
+         1 X 4,00       T18,00%            4,00g
+002 0000000000007                       VELA IGN
+         1 X 10,00         F1             10,00g
+                              ------------------
+Subtotal  R$                              14,00
+desconto                                  -0,10
+TOTAL  R$                                 13,90
+DINHEIRO                                  13,90
+------------------------------------------------
+VENDEDOR.: 000001                               
+CAIXA....: 000                                  
+No PEDIDO: 0000026                              
+------------------------------------------------
+BEMATECH        MP-2000 TH FI        ECF-IF 
+ECF:001 LJ:0001                  VERSÃO:01.00.00
+FAB:EMULADOR                04/11/2008 09:52:38 
+QQQQQQQQQQQQQQTPQY                          BR
+------------------------------------------------
+
+
+
+
+Bematech Ind. e Com. de Equip. Eletronicos S.A.
+Estrada de Santa Candida, 263  82.630-490
+Curitiba - Parana - Brasil
+
+CNPJ:82.373.077/0001-71  
+IE:10181465-30                             UF:PR
+------------------------------------------------
+04/11/2008 09:53:10   CCF:000004      COO:000007
+------------------------------------------------
+      CUPOM FISCAL      
+ITEM   CÓDIGO             DESCRIÇÃO
+QTD.UN. VL UNITÁRIO( R$)  ST        VL ITEM( R$)
+------------------------------------------------
+001 0000000000023                         TESTE2
+         1 X 4,00       T18,00%            4,00g
+002 0000000000001                        ADFADFD
+         1 X 0,05       T18,00%            0,05g
+003 0000000000002                       PAPEL A4
+         1 X 118,00     T18,00%          118,00g
+Item Cancelado:003                      -118,00
+                              ------------------
+Subtotal  R$                               4,05
+acréscimo                                  1,00g
+TOTAL  R$                                  5,05
+DINHEIRO                                   6,00
+TROCO  R$                                  0,95
+------------------------------------------------
+VENDEDOR.: 000001                               
+CAIXA....: 000                                  
+No PEDIDO: 0000027                              
+------------------------------------------------
+BEMATECH        MP-2000 TH FI        ECF-IF 
+ECF:001 LJ:0001                  VERSÃO:01.00.00
+FAB:EMULADOR                04/11/2008 09:54:32 
+QQQQQQQQQQQQQWIEWQ                          BR
+------------------------------------------------
+
+
+
+
+Bematech Ind. e Com. de Equip. Eletronicos S.A.
+Estrada de Santa Candida, 263  82.630-490
+Curitiba - Parana - Brasil
+
+CNPJ:82.373.077/0001-71  
+IE:10181465-30                             UF:PR
+------------------------------------------------
+04/11/2008 09:56:19   CCF:000005      COO:000008
+------------------------------------------------
+      CUPOM FISCAL      
+ITEM   CÓDIGO             DESCRIÇÃO
+QTD.UN. VL UNITÁRIO( R$)  ST        VL ITEM( R$)
+------------------------------------------------
+001 0000000000023                         TESTE2
+         2 X 4,00       T18,00%            8,00g
+-------------CUPOM FISCAL CANCELADO-------------
+------------------------------------------------
+BEMATECH        MP-2000 TH FI        ECF-IF 
+ECF:001 LJ:0001                  VERSÃO:01.00.00
+FAB:EMULADOR                04/11/2008 09:57:44 
+QQQQQQQQQQQQQWOQWQ                          BR
+------------------------------------------------
+
+
+
+
+Bematech Ind. e Com. de Equip. Eletronicos S.A.
+Estrada de Santa Candida, 263  82.630-490
+Curitiba - Parana - Brasil
+
+CNPJ:82.373.077/0001-71  
+IE:10181465-30                             UF:PR
+------------------------------------------------
+04/11/2008 09:57:56   CCF:000006      COO:000009
+------------------------------------------------
+      CUPOM FISCAL      
+ITEM   CÓDIGO             DESCRIÇÃO
+QTD.UN. VL UNITÁRIO( R$)  ST        VL ITEM( R$)
+------------------------------------------------
+001 0000000000023                         TESTE2
+         1 X 4,00       T18,00%            4,00g
+                              ------------------
+TOTAL  R$                                  4,00
+DINHEIRO                                   4,00
+------------------------------------------------
+VENDEDOR.: 000001                               
+CAIXA....: 000                                  
+No PEDIDO: 0000028                              
+------------------------------------------------
+BEMATECH        MP-2000 TH FI        ECF-IF 
+ECF:001 LJ:0001                  VERSÃO:01.00.00
+FAB:EMULADOR                04/11/2008 09:58:50 
+QQQQQQQQQQQQQWOTWQ                          BR
+------------------------------------------------
+
+
+
+
+Bematech Ind. e Com. de Equip. Eletronicos S.A.
+Estrada de Santa Candida, 263  82.630-490
+Curitiba - Parana - Brasil
+
+CNPJ:82.373.077/0001-71  
+IE:10181465-30                             UF:PR
+------------------------------------------------
+04/11/2008 10:00:10   CCF:000007      COO:000010
+------------------------------------------------
+      CUPOM FISCAL      
+ITEM   CÓDIGO             DESCRIÇÃO
+QTD.UN. VL UNITÁRIO( R$)  ST        VL ITEM( R$)
+------------------------------------------------
+001 0000000000023                         TESTE2
+         1 X 4,00       T18,00%            4,00g
+002 0000000000005                     TARCIANO 2
+         1 X 10,20         F1             10,20g
+-------------CUPOM FISCAL CANCELADO-------------
+------------------------------------------------
+BEMATECH        MP-2000 TH FI        ECF-IF 
+ECF:001 LJ:0001                  VERSÃO:01.00.00
+FAB:EMULADOR                04/11/2008 10:01:19 
+QQQQQQQQQQQQQWPORQ                          BR
+------------------------------------------------
+
+
+
+
+Bematech Ind. e Com. de Equip. Eletronicos S.A.
+Estrada de Santa Candida, 263  82.630-490
+Curitiba - Parana - Brasil
+
+CNPJ:82.373.077/0001-71  
+IE:10181465-30                             UF:PR
+------------------------------------------------
+04/11/2008 10:01:32   CCF:000008      COO:000011
+------------------------------------------------
+      CUPOM FISCAL      
+ITEM   CÓDIGO             DESCRIÇÃO
+QTD.UN. VL UNITÁRIO( R$)  ST        VL ITEM( R$)
+------------------------------------------------
+001 0000000000023                         TESTE2
+         2 X 4,00       T18,00%            8,00g
+                              ------------------
+TOTAL  R$                                  8,00
+DINHEIRO                                   1,00
+CARTAO                                     7,00
+SOMA                                       8,00
+------------------------------------------------
+VENDEDOR.: 000001                               
+CAIXA....: 000                                  
+No PEDIDO: 0000029                              
+------------------------------------------------
+BEMATECH        MP-2000 TH FI        ECF-IF 
+ECF:001 LJ:0001                  VERSÃO:01.00.00
+FAB:EMULADOR                04/11/2008 10:02:16 
+QQQQQQQQQQQQQEQURQ                          BR
+------------------------------------------------
+
+
+
+
+Bematech Ind. e Com. de Equip. Eletronicos S.A.
+Estrada de Santa Candida, 263  82.630-490
+Curitiba - Parana - Brasil
+
+CNPJ:82.373.077/0001-71  
+IE:10181465-30                             UF:PR
+------------------------------------------------
+04/11/2008 10:02:51   CCF:000008      COO:000012
+------------------------------------------------
+      CUPOM FISCAL      
+      CANCELAMENTO      
+Cancelamento de Cupom Fiscal(CFC):          0004
+COO do Cupom Fiscal Cancelado:            000011
+Valor Total da Operação  R$                 8,00
+Quantidade de CCD cancelados:               0000
+------------------------------------------------
+BEMATECH        MP-2000 TH FI        ECF-IF 
+ECF:001 LJ:0001                  VERSÃO:01.00.00
+FAB:EMULADOR                04/11/2008 10:02:51 
+QQQQQQQQQQQQQEQURQ                          BR
+------------------------------------------------
+
+
+
+

@@ -1,0 +1,22 @@
+[08:11:52]: Arquivo de log aberto por ECF32M.DLL
+[08:11:52]: ARQ.: 2.0.2.5
+[08:11:52]: DLL: (OpenSerial) - Dll nao conseguiu abrir a porta serial.
+[08:11:52]: ERRO: Dll nao conseguiu abrir o dispositivo COM1
+[08:11:52]: DLL: (OpenCif) - Dll nao conseguiu verificar versao de firmware do ecf - [TX] Ret.: -87.
+[08:11:52]: DLL: (OpenCif) - Status: -87.
+[08:12:04]: DLL: (OpenSerial) - Dll nao conseguiu abrir a porta serial.
+[08:12:04]: ERRO: Dll nao conseguiu abrir o dispositivo COM1
+[08:12:04]: DLL: (OpenCif) - Dll nao conseguiu verificar versao de firmware do ecf - [TX] Ret.: -87.
+[08:12:04]: DLL: (OpenCif) - Status: -87.
+[08:12:11]: DLL: (OpenSerial) - Dll nao conseguiu abrir a porta serial.
+[08:12:11]: ERRO: Dll nao conseguiu abrir o dispositivo COM1
+[08:12:11]: DLL: (OpenCif) - Dll nao conseguiu verificar versao de firmware do ecf - [TX] Ret.: -87.
+[08:12:11]: DLL: (OpenCif) - Status: -87.
+[08:13:20]: DLL: (OpenSerial) - Dll nao conseguiu abrir a porta serial.
+[08:13:20]: ERRO: Dll nao conseguiu abrir o dispositivo COM1
+[08:13:20]: DLL: (OpenCif) - Dll nao conseguiu verificar versao de firmware do ecf - [TX] Ret.: -87.
+[08:13:20]: DLL: (OpenCif) - Status: -87.
+[08:14:53]: DLL: (OpenSerial) - Dll nao conseguiu abrir a porta serial.
+[08:14:53]: ERRO: Dll nao conseguiu abrir o dispositivo COM1
+[08:14:53]: DLL: (OpenCif) - Dll nao conseguiu verificar versao de firmware do ecf - [TX] Ret.: -87.
+[08:14:53]: DLL: (OpenCif) - Status: -87.

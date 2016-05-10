@@ -1,0 +1,456 @@
+                If (Comando = 'ReducaoZ') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_ReducaoZ(pchar(DateToStr(Date)),pchar(TimeToStr(Time)));
+                      iRetorno := Retorno_Impressora('ReducaoZ',iRetorno);
+                    End;
+                If (Comando = 'MemoriaFiscal') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_LeituraMemoriaFiscalData(
+                                       pchar( Param1 ), pchar( Param2 ) );
+                      iRetorno := Retorno_Impressora('MemoriaFiscal',iRetorno);
+                    End;
+                If (Comando = 'StatusEcf') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      mRetorno := 0;
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_FlagsFiscais(mRetorno);
+                      // Verifica mRetorno
+                      IF mRetorno >= 128 Then
+                           Begin
+                              mRetorno := mRetorno - 128;
+                              Status := 'Sem espaço de memoria';
+                              ShowMessage('Sem espaço de memoria!!!');
+                              iRetorno := 0;
+                           END;
+                      IF mRetorno >= 64  Then
+                           begin
+                              mRetorno := mRetorno - 64;
+                              Status   := 'Não existe';
+                           End;
+                      IF mRetorno >= 32  Then
+                           Begin
+                              mRetorno := mRetorno - 32;
+                              Status := 'Permitir cancelar cupom';
+                           End;
+                      IF mRetorno >= 16  Then
+                           Begin
+                              mRetorno := mRetorno - 16;
+                              Status := 'Não Existe';
+                           End;
+                      IF mRetorno >= 8   Then
+                           Begin
+                              mRetorno := mRetorno - 8;
+                              Status := 'Redução Z já emitida';
+                              ShowMessage('Redução Z já emitida!!!');
+                              iRetorno := 0;
+                           End;
+                      IF mRetorno >= 4   Then
+                           Begin
+                              mRetorno := mRetorno - 4;
+                              Status := 'Horario de verão, selecionado = 1';
+                           End;
+                      IF mRetorno >= 2   Then
+                           Begin
+                              mRetorno := mRetorno - 2;
+                              Status := 'Fechamento de formas de pagamento iniciado';
+                           End;
+                      IF mRetorno >= 1   Then
+                           Begin
+                              mRetorno := mRetorno - 1;
+                              Status := 'Cupom fiscal em Aberto';
+                              uBematech.Bematech_FI_CancelaCupom;
+                          End;
+                      //
+                      iRetorno := Retorno_Impressora('StatusEcf',iRetorno);
+                     // uBematech.Analisa_iRetorno;
+                    End;
+                If (Comando = 'AbriCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_AbreCupom( pchar( '' ) );
+                      iRetorno := Retorno_Impressora('AbriCupom',iRetorno);
+                      uBematech.Analisa_iRetorno;
+                    End;
+                If (Comando = 'CancelaCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_CancelaCupom;
+                      iRetorno := Retorno_Impressora('CancelaCupom',iRetorno);
+                    End;
+                If (Comando = 'CancelaItemGenerico') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_CancelaItemGenerico(PChar(Param1)) ;
+                      iRetorno := Retorno_Impressora('CancelaItemGenerico',iRetorno);
+                    End;
+                If (Comando = 'CancelaItemAnterior') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_CancelaItemAnterior;
+                      iRetorno := Retorno_Impressora('CancelaItemAnterior',iRetorno);
+                    End;
+                If (Comando = 'VendaItem') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_VendeItem
+                                 ( pchar( Param1 ),     // Codigo (13)
+                                   pchar( Param2 ),     // Descricao (29)
+                                   pchar( Param3 ),     // Aliquota (2)  Indice da ECF
+                                   pchar( Param4 ),     // Tipo Qtde (1) I - Inteira e F - Fracionária.
+                                   pchar( Param5 ),     // Quantidade (7)  3 são fração
+                                   StrtoInt(Param6),    // Casa Decimais (Valores validos : 2 ou 3)
+                                   pchar( Param7 ),     // Valor (8)
+                                   pchar( Param8 ),     // Tipo desconto (Valores validos : % ou $)
+                                   pchar( Param9 ) );   // Desconto (8 para valor e 4 p/ percentual)
+                      iRetorno := Retorno_Impressora('VendaItem',iRetorno);
+                    End;
+                If (Comando = 'TotalCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := 0;
+                      While iRetorno = 0 do
+                      begin
+                           iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                           If (iRetorno = 0) Then
+                                 If Application.MessageBox('Impressora fiscal não responde, tenta novamente?',
+                                       'ATENÇÃO', MB_YESNO+MB_ICONQUESTION+MB_DEFBUTTON2+MB_APPLMODAL) = idNo then
+                                         break;
+                      End;
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_IniciaFechamentoCupom(
+                              pchar( Param1 ),    // Acrescimo/Desconto (Valores validos : A ou D)
+                              pchar( Param2 ),    // TipoAcrescimoDesconto (Valores validos : % ou $)
+                              pchar( Param3 ) );  // Valor AcrescimoDesconto (14 por valor ou 4 percentual)
+                      iRetorno := Retorno_Impressora('TotalCupom',iRetorno);
+                    End;
+                If (Comando = 'Pagamento') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := 0;
+                      While iRetorno = 0 do
+                      begin
+                           iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                           If (iRetorno = 0) Then
+                                 If Application.MessageBox('Impressora fiscal não responde, tenta novamente?',
+                                       'ATENÇÃO', MB_YESNO+MB_ICONQUESTION+MB_DEFBUTTON2+MB_APPLMODAL) = idNo then
+                                         break;
+                      End;
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_EfetuaFormaPagamento(
+                                    pchar( Param1 ),    // forma de pagamento com no máximo 16 caracteres.
+                                    pchar( Param2 ) );  // valor da forma de pagamento com até 14 dígitos.
+                      iRetorno := Retorno_Impressora('Pagamento',iRetorno);
+                    End;
+                If (Comando = 'FecharCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := 0;
+                      While iRetorno = 0 do
+                      begin
+                           iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                           If (iRetorno = 0) Then
+                                 If Application.MessageBox('Impressora fiscal não responde, tenta novamente?',
+                                       'ATENÇÃO', MB_YESNO+MB_ICONQUESTION+MB_DEFBUTTON2+MB_APPLMODAL) = idNo then
+                                         break;
+                      End;
+                      If (iRetorno = 1) Then
+                          iRetorno := uBematech.Bematech_FI_TerminaFechamentoCupom(
+                                  pchar( Param1 ) );  // STRING com a mensagem promocional com
+                                                      //até 384 caracteres (8 linhas X 48 colunas),
+                                                      //para a impressora fiscal MP-20 FI II, e
+                                                      //320 caracteres (8 linhas X 40 colunas),
+                                                      //para a impressora fiscal MP-40 FI II.
+                      iRetorno := Retorno_Impressora('FecharCupom',iRetorno);
+                    End;
+                If (Comando = 'NumeroCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      NumeroCupom := uFuncoes.Replicate(' ',6);
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_NumeroCupom( NumeroCupom );
+                      //iRetorno := Retorno_Impressora('NumeroCupom',iRetorno);
+                      mRetorno := Retorno_Impressora('NumeroCupom',iRetorno);
+                    End;
+                If (Comando = 'AbreComprovanteNaoFiscalVinculado') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_AbreComprovanteNaoFiscalVinculado(pchar( Param1 ), pchar( Param2 ), pchar( Param3 ));
+                      iRetorno := Retorno_Impressora('AbreComprovanteNaoFiscalVinculado',iRetorno);
+                    End;
+                If (Comando = 'UsaComprovanteNaoFiscalVinculado') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_UsaComprovanteNaoFiscalVinculado(pchar( Param1 ));
+                      iRetorno := Retorno_Impressora('UsaComprovanteNaoFiscalVinculado',iRetorno);
+                    End;
+                If (Comando = 'FechaComprovanteNaoFiscalVinculado') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_FechaComprovanteNaoFiscalVinculado();
+                      iRetorno := Retorno_Impressora('FechaComprovanteNaoFiscalVinculado',iRetorno);
+                    End;
+                If (Comando = 'RelatorioGerencial') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_RelatorioGerencial(pchar( Param1 ));
+                      iRetorno := Retorno_Impressora('RelatorioGerencial',iRetorno);
+                    End;
+                If (Comando = 'FechaRelatorioGerencial') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uBematech.Bematech_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uBematech.Bematech_FI_FechaRelatorioGerencial();
+                      iRetorno := Retorno_Impressora('FechaRelatorioGerencial',iRetorno);
+                    End;
+            End;
+        2 : begin    // DARUMA
+                If (Comando = 'LeituraX') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_LeituraX();
+                    End;
+                If (Comando = 'ReducaoZ') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           //iRetorno := uDaruma.Daruma_FI_ReducaoZ('','');
+                    End;
+                If (Comando = 'MemoriaFiscal') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_LeituraMemoriaFiscalData(
+                                       pchar( Param1 ), pchar( Param2 ) );
+                      iRetorno := Retorno_Impressora('MemoriaFiscal',iRetorno);
+                    End;
+                If (Comando = 'StatusEcf') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      mRetorno := 0;
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_FlagsFiscais(mRetorno);
+                      // Verifica mRetorno
+                      IF mRetorno >= 128 Then
+                           Begin
+                              mRetorno := mRetorno - 128;
+                              Status := 'Sem espaço de memoria';
+                              ShowMessage('Sem espaço de memoria!!!');
+                              iRetorno := 0;
+                           END;
+                      IF mRetorno >= 64  Then
+                           begin
+                              mRetorno := mRetorno - 64;
+                              Status   := 'Não existe';
+                           End;
+                      IF mRetorno >= 32  Then
+                           Begin
+                              mRetorno := mRetorno - 32;
+                              Status := 'Permitir cancelar cupom';
+                           End;
+                      IF mRetorno >= 16  Then
+                           Begin
+                              mRetorno := mRetorno - 16;
+                              Status := 'Não Existe';
+                           End;
+                      IF mRetorno >= 8   Then
+                           Begin
+                              mRetorno := mRetorno - 8;
+                              Status := 'Redução Z já emitida';
+                              ShowMessage('Redução Z já emitida!!!');
+                              iRetorno := 0;
+                           End;
+                      IF mRetorno >= 4   Then
+                           Begin
+                              mRetorno := mRetorno - 4;
+                              Status := 'Horario de verão, selecionado = 1';
+                           End;
+                      IF mRetorno >= 2   Then
+                           Begin
+                              mRetorno := mRetorno - 2;
+                              Status := 'Fechamento de formas de pagamento iniciado';
+                           End;
+                      IF mRetorno >= 1   Then
+                           Begin
+                              mRetorno := mRetorno - 1;
+                              Status := 'Cupom fiscal em Aberto';
+                              uDaruma.Daruma_FI_CancelaCupom;
+                          End;
+                      //
+                    End;
+                If (Comando = 'AbriCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_AbreCupom( pchar( '' ) );
+                    End;
+                If (Comando = 'CancelaCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_CancelaCupom;
+                    End;
+                If (Comando = 'CancelaItemGenerico') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_CancelaItemGenerico(PChar(Param1)) ;
+                    End;
+                If (Comando = 'CancelaItemAnterior') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_CancelaItemAnterior;
+                   End;
+                If (Comando = 'VendaItem') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_VendeItem
+                                 ( pchar( Param1 ),     // Codigo (13)
+                                   pchar( Param2 ),     // Descricao (29)
+                                   pchar( Param3 ),     // Aliquota (2)  Indice da ECF
+                                   pchar( Param4 ),     // Tipo Qtde (1) I - Inteira e F - Fracionária.
+                                   pchar( Param5 ),     // Quantidade (7)  3 são fração
+                                   StrtoInt(Param6),    // Casa Decimais (Valores validos : 2 ou 3)
+                                   pchar( Param7 ),     // Valor (8)
+                                   pchar( Param8 ),     // Tipo desconto (Valores validos : % ou $)
+                                   pchar( Param9 ) );   // Desconto (8 para valor e 4 p/ percentual)
+                    End;
+                If (Comando = 'TotalCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := 0;
+                      While iRetorno = 0 do
+                      begin
+                           iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                           If (iRetorno = 0) Then
+                                 If Application.MessageBox('Impressora fiscal não responde, tenta novamente?',
+                                       'ATENÇÃO', MB_YESNO+MB_ICONQUESTION+MB_DEFBUTTON2+MB_APPLMODAL) = idNo then
+                                         break;
+                      End;
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.Daruma_FI_IniciaFechamentoCupom(
+                              pchar( Param1 ),    // Acrescimo/Desconto (Valores validos : A ou D)
+                              pchar( Param2 ),    // TipoAcrescimoDesconto (Valores validos : % ou $)
+                              pchar( Param3 ) );  // Valor AcrescimoDesconto (14 por valor ou 4 percentual)
+                    End;
+                If (Comando = 'Pagamento') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := 0;
+                      While iRetorno = 0 do
+                      begin
+                           iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                           If (iRetorno = 0) Then
+                                 If Application.MessageBox('Impressora fiscal não responde, tenta novamente?',
+                                       'ATENÇÃO', MB_YESNO+MB_ICONQUESTION+MB_DEFBUTTON2+MB_APPLMODAL) = idNo then
+                                         break;
+                      End;
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_EfetuaFormaPagamento(
+                                    pchar( Param1 ),    // forma de pagamento com no máximo 16 caracteres.
+                                    pchar( Param2 ) );  // valor da forma de pagamento com até 14 dígitos.
+                    End;
+                If (Comando = 'FecharCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := 0;
+                      While iRetorno = 0 do
+                      begin
+                           iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                           If (iRetorno = 0) Then
+                                 If Application.MessageBox('Impressora fiscal não responde, tenta novamente?',
+                                       'ATENÇÃO', MB_YESNO+MB_ICONQUESTION+MB_DEFBUTTON2+MB_APPLMODAL) = idNo then
+                                         break;
+                      End;
+                      If (iRetorno = 1) Then
+                          iRetorno := uDaruma.daruma_FI_TerminaFechamentoCupom(
+                                  pchar( Param1 ) );  // STRING com a mensagem promocional com
+                                                      //até 384 caracteres (8 linhas X 48 colunas),
+                                                      //para a impressora fiscal MP-20 FI II, e
+                                                      //320 caracteres (8 linhas X 40 colunas),
+                                                      //para a impressora fiscal MP-40 FI II.
+                    End;
+                If (Comando = 'NumeroCupom') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      NumeroCupom := uFuncoes.Replicate(' ',6);
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_NumeroCupom( NumeroCupom );
+                    End;
+                If (Comando = 'AbreComprovanteNaoFiscalVinculado') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_AbreComprovanteNaoFiscalVinculado(pchar( Param1 ), pchar( Param2 ), pchar( Param3 ));
+                    End;
+                If (Comando = 'UsaComprovanteNaoFiscalVinculado') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_UsaComprovanteNaoFiscalVinculado(pchar( Param1 ));
+                    End;
+                If (Comando = 'FechaComprovanteNaoFiscalVinculado') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_FechaComprovanteNaoFiscalVinculado();
+                    End;
+                If (Comando = 'RelatorioGerencial') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_RelatorioGerencial(pchar( Param1 ));
+                    End;
+                If (Comando = 'FechaRelatorioGerencial') Then
+                    begin
+                      // Verifica Impressora
+                      iRetorno := uDaruma.Daruma_FI_VerificaImpressoraLigada();
+                      If (iRetorno = 1) Then
+                           iRetorno := uDaruma.Daruma_FI_FechaRelatorioGerencial();
+                    End;
+            End;
+            //
